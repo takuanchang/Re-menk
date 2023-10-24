@@ -10,7 +10,7 @@ public class Test : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    // 日本語のコメントだよ
     void Update()
     {
         
