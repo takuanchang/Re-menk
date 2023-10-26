@@ -1,0 +1,26 @@
+# プロジェクト内のルートなのでtrueを指定する
+root = true
+
+# ====================== 全ファイル共通 ====================== 
+[*]
+# 改行はCRLF
+end_of_line = crlf
+
+# エンコードはutf-8
+charset = utf-8
+
+# ====================== C#ファイル専用 ====================== 
+[*.cs]
+# インデントと間隔
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# 一行の長さ
+max_line_length = 120
+
+# 末尾の空白を削除
+trim_trailing_whitespace = true
+
+# ファイルの最終行に改行を追加
+insert_final_newline = true
