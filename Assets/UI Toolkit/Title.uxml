@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Label tabindex="-1" text="Hogame" parse-escape-sequences="true" display-tooltip-when-elided="true" name="TitleLabel" style="align-items: stretch; justify-content: space-between; align-self: flex-start; font-size: 240px; -unity-font: url(&apos;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=4c62aa18d71f3164ca27882b9fdce57d&amp;type=3#NotInter-Regular&apos;);" />
+    <ui:Button text="Game Start" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: flex-start; -unity-text-align: middle-center; font-size: 80px;" />
+    <ui:Button text="How to Play" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: flex-start; justify-content: flex-start; font-size: 80px;" />
+    <ui:Button text="Settings" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: flex-start; position: absolute; bottom: 0; font-size: 80px;" />
+    <ui:Button text="Exit" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: flex-end; flex-direction: column; bottom: 0; position: absolute; font-size: 80px;" />
+</ui:UXML>
