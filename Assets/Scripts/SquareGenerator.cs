@@ -7,6 +7,9 @@ public class SquareGenerator : MonoBehaviour
     [SerializeField]
     private GameObject m_Square;
 
+    [SerializeField]
+    private GameObject m_Piece;
+
     int m_Length = 8;
 
     public void InitializeBoard()
@@ -16,7 +19,7 @@ public class SquareGenerator : MonoBehaviour
         {
             var row = i % m_Length;
             var column = i / m_Length;
-            var position = new Vector3(row * 10, 0, column * 10);
+            var position = new Vector3(row, 0, column);
             var square = Instantiate(m_Square, position, Quaternion.identity, transform);
             //square.Initialize(new Vector2Int(row, column));
 
@@ -25,6 +28,18 @@ public class SquareGenerator : MonoBehaviour
             //{
             //    square.GetComponent<Renderer>().material.color = Color.black;
             //}
+
+            // 駒の初期化4つ
+            if (i == 27 || i == 36)
+            {
+                position.y = 0.5f;
+                var piece = Instantiate(m_Piece, position, Quaternion.identity, transform);
+            }
+            if (i == 28 || i == 35)
+            {
+                position.y = 0.5f;
+                var piece = Instantiate(m_Piece, position, Quaternion.Euler(180, 0, 0), transform);
+            }
         }
     }
 
