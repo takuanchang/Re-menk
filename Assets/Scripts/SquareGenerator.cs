@@ -16,7 +16,7 @@ public class SquareGenerator : MonoBehaviour
         {
             var row = i % m_Length;
             var column = i / m_Length;
-            var position = new Vector3(row * 10, 0, column * 10);
+            var position = new Vector3(row, 0, column);
             var square = Instantiate(m_Square, position, Quaternion.identity, transform);
             //square.Initialize(new Vector2Int(row, column));
 
