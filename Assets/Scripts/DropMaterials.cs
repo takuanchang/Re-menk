@@ -7,13 +7,13 @@ public class DropMaterials : MonoBehaviour
     private float _speed = 5.0f;
 
     [SerializeField]
-    private Transform m_origin_Piece;
-    private Transform target;
+    private GravityController m_OriginPiece;
+    private GravityController m_Target;
 
     public void InitializePiece()
     {
         var position = new Vector3((float)3.5, 5, (float)3.5);
-        target = Instantiate(m_origin_Piece, position, Quaternion.identity, transform);
+        m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
     }
 
     // Start is called before the first frame update
@@ -25,6 +25,11 @@ public class DropMaterials : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            m_Target.UseGravity();
+            m_Target = null;
+        }
         //x軸方向、z軸方向の入力を取得
         //Horizontal、水平、横方向のイメージ
         var _input_x = Input.GetAxisRaw("Horizontal");
@@ -36,14 +41,14 @@ public class DropMaterials : MonoBehaviour
         //ベクトルの向きを取得
         Vector3 direction = velocity.normalized;
 
+        var transform = m_Target.transform;
+
         //移動距離を計算
         float distance = _speed * Time.deltaTime;
-        //移動先を計算
-        Vector3 destination = target.position + direction * distance;
 
         //移動先に向けて回転
         //transform.LookAt(destination);
         //移動先の座標を設定
-        target.position = destination;
+        transform.position += direction * distance;
     }
 }
