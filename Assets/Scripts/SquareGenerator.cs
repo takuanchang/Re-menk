@@ -7,6 +7,9 @@ public class SquareGenerator : MonoBehaviour
     [SerializeField]
     private GameObject m_Square;
 
+    [SerializeField]
+    private GameObject m_Piece;
+
     int m_Length = 8;
 
     public void InitializeBoard()
