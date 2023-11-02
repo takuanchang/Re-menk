@@ -7,8 +7,8 @@ public class DropMaterials : MonoBehaviour
     private float m_Speed = 5.0f;
 
     [SerializeField]
-    private GravityController m_OriginPiece;
-    private GravityController m_Target;
+    private Piece m_OriginPiece;
+    private Piece m_Target;
 
     public void InitializePiece()
     {
@@ -16,15 +16,37 @@ public class DropMaterials : MonoBehaviour
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
     }
 
+    // test用(初期配置する)
+    public void test()
+    {
+        var position = new Vector3((float)4.5, 2, (float)5.5);
+        m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
+        m_Target.UseGravity();
+        m_Target = null;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        //test();
         InitializePiece();
     }
 
+    private bool isDropping = false;
+    float timer = 0.0f;
     // Update is called once per frame
     void Update()
     {
+        if (isDropping)
+        {
+            timer += Time.deltaTime;
+            if (timer >= 3.0f)
+            {
+                InitializePiece();
+                isDropping = false;
+                timer = 0.0f;
+            }
+        }
         if (m_Target == null)
         {
             return;
@@ -33,7 +55,7 @@ public class DropMaterials : MonoBehaviour
         {
             m_Target.UseGravity();
             m_Target = null;
-
+            isDropping = true;
             return;
         }
 

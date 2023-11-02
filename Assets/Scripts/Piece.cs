@@ -11,11 +11,7 @@ public class Piece : MonoBehaviour
     public enum Status {Stand, Front, Back};
     private Rigidbody rb;
 
-    // 今だけ
-    [SerializeField]
-    bool on;
-
-    float explosion_param = 10.0f;
+    float explosion_param = 2.0f;
 
     // 表裏の判定
     public Status GetStatus()
@@ -30,21 +26,13 @@ public class Piece : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (on && transform.position.y <= 0.501)
-        {
-            GetColliders();
-            on = false;
-        }
-    }
-
 
     // 本番はイベント実行時のみ呼ぶ
-    void GetColliders()
+    public void GetColliders()
     {
         // 近くにあるコライダーを取得
         Collider[] hitColliders = new Collider[1000];
@@ -78,7 +66,14 @@ public class Piece : MonoBehaviour
     {
         Vector3 vec = transform.position - pos;
         float r = vec.magnitude;
+        vec.y += 5.0f;
         rb.AddForce(explosion_param / (r * r * r) * vec, ForceMode.Impulse);
         rb.AddTorque(explosion_param / (r * r * r) * new Vector3(vec.z, 0.0f, -vec.x), ForceMode.Impulse);
+    }
+
+    public void UseGravity()
+    {
+        rb.useGravity = true;
+        rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
     }
 }
