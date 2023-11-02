@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DropMaterials : MonoBehaviour
 {
-    private float _speed = 5.0f;
+    private float m_Speed = 5.0f;
 
     [SerializeField]
     private GravityController m_OriginPiece;
@@ -51,7 +51,7 @@ public class DropMaterials : MonoBehaviour
         var transform = m_Target.transform;
 
         //移動距離を計算
-        float distance = _speed * Time.deltaTime;
+        float distance = m_Speed * Time.deltaTime;
 
         //移動先に向けて回転
         //transform.LookAt(destination);

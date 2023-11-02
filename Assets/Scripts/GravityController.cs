@@ -6,17 +6,17 @@ public class GravityController : MonoBehaviour
 {
     public Vector3 localGravity;
 
-    private Rigidbody rb;
+    private Rigidbody m_Rigidbody;
     // Start is called before the first frame update
     public void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
+        m_Rigidbody = GetComponent<Rigidbody>();
+        m_Rigidbody.useGravity = false;
     }
 
     public void UseGravity()
     {
-        rb.useGravity = true;
+        m_Rigidbody.useGravity = true;
         // add force?
     }
 }
