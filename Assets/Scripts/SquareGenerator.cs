@@ -29,10 +29,4 @@ public class SquareGenerator : MonoBehaviour
     {
         InitializeBoard();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
