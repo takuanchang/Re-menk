@@ -25,11 +25,18 @@ public class DropMaterials : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (m_Target == null)
+        {
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             m_Target.UseGravity();
             m_Target = null;
+
+            return;
         }
+
         //x軸方向、z軸方向の入力を取得
         //Horizontal、水平、横方向のイメージ
         var _input_x = Input.GetAxisRaw("Horizontal");
