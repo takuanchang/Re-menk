@@ -5,7 +5,9 @@ using UnityEngine.EventSystems;
 
 public class Piece : MonoBehaviour
 {
+    // 表裏判定の許容誤差
     static float epsilon = 0.2f;
+    // 駒の状態の種類
     public enum Status {Stand, Front, Back};
     private Rigidbody rb;
 
@@ -13,8 +15,9 @@ public class Piece : MonoBehaviour
     [SerializeField]
     bool on;
 
-    float futtobuparam = 10.0f;
+    float explosion_param = 10.0f;
 
+    // 表裏の判定
     public Status GetStatus()
     {
         Vector3 up = transform.up.normalized;
@@ -32,7 +35,7 @@ public class Piece : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.position.y <= 1.56 && on)
+        if (on && transform.position.y <= 0.501)
         {
             GetColliders();
             on = false;
@@ -43,18 +46,21 @@ public class Piece : MonoBehaviour
     // 本番はイベント実行時のみ呼ぶ
     void GetColliders()
     {
+        // 近くにあるコライダーを取得
         Collider[] hitColliders = new Collider[1000];
         int numColliders = Physics.OverlapSphereNonAlloc(transform.position, 4.01f, hitColliders);
         for (int i = 0; i < numColliders; i++)
         {
+            // 自分以外の駒の時
             if(hitColliders[i].TryGetComponent<Piece>(out var p))
             {
                 if (p == this)
                 {
                     continue;
                 }
-                p.Futtobu(transform.position);
+                p.Explosion(transform.position);
             }
+            // マスの時
             else if (hitColliders[i].TryGetComponent<Square>(out var m))
             {
 
@@ -67,11 +73,12 @@ public class Piece : MonoBehaviour
     }
 
     // 今だけ
-    public void Futtobu(Vector3 pos)
+    // 吹っ飛ぶ処理
+    public void Explosion(Vector3 pos)
     {
         Vector3 vec = transform.position - pos;
         float r = vec.magnitude;
-        //rb.AddForce(futtobuparam / (r * r * r) * vec, ForceMode.Impulse);
-        rb.AddTorque(futtobuparam / (r * r * r) * new Vector3(vec.z, 0.0f, -vec.x), ForceMode.Impulse);
+        rb.AddForce(explosion_param / (r * r * r) * vec, ForceMode.Impulse);
+        rb.AddTorque(explosion_param / (r * r * r) * new Vector3(vec.z, 0.0f, -vec.x), ForceMode.Impulse);
     }
 }
