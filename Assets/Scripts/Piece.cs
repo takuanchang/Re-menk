@@ -13,6 +13,8 @@ public class Piece : MonoBehaviour
     [SerializeField]
     bool on;
 
+    float futtobuparam = 10.0f;
+
     public Status GetStatus()
     {
         Vector3 up = transform.up.normalized;
@@ -51,7 +53,7 @@ public class Piece : MonoBehaviour
                 {
                     continue;
                 }
-                p.Futtobu(p.transform.position);
+                p.Futtobu(transform.position);
             }
             else if (hitColliders[i].TryGetComponent<Square>(out var m))
             {
@@ -67,7 +69,9 @@ public class Piece : MonoBehaviour
     // 今だけ
     public void Futtobu(Vector3 pos)
     {
-        rb.AddForce(new Vector3(0.0f,5.0f, -2.0f), ForceMode.Impulse);
-        rb.AddTorque(new Vector3(-6.0f, 0.0f, 0.0f), ForceMode.Impulse);
+        Vector3 vec = transform.position - pos;
+        float r = vec.magnitude;
+        //rb.AddForce(futtobuparam / (r * r * r) * vec, ForceMode.Impulse);
+        rb.AddTorque(futtobuparam / (r * r * r) * new Vector3(vec.z, 0.0f, -vec.x), ForceMode.Impulse);
     }
 }
