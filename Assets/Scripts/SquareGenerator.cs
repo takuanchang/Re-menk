@@ -28,18 +28,6 @@ public class SquareGenerator : MonoBehaviour
             //{
             //    square.GetComponent<Renderer>().material.color = Color.black;
             //}
-
-            // 駒の初期化4つ
-            if (i == 27 || i == 36)
-            {
-                position.y = 0.5f;
-                var piece = Instantiate(m_Piece, position, Quaternion.identity, transform);
-            }
-            if (i == 28 || i == 35)
-            {
-                position.y = 0.5f;
-                var piece = Instantiate(m_Piece, position, Quaternion.Euler(180, 0, 0), transform);
-            }
         }
     }
 
