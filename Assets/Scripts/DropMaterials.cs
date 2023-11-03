@@ -16,19 +16,9 @@ public class DropMaterials : MonoBehaviour
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
     }
 
-    // test用(初期配置する)
-    public void test()
-    {
-        var position = new Vector3((float)4.5, 2, (float)5.5);
-        m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
-        m_Target.UseGravity();
-        m_Target = null;
-    }
-
     // Start is called before the first frame update
     void Start()
     {
-        //test();
         InitializePiece();
     }
 

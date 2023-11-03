@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3140959444753442965}
   - component: {fileID: 2884388977146631267}
   - component: {fileID: 5699550813302054436}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: square
   m_Icon: {fileID: 0}
@@ -146,4 +146,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 078619597a6f4434ea422fac4fc83e6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ep: 5
