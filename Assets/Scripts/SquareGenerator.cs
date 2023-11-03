@@ -7,6 +7,9 @@ public class SquareGenerator : MonoBehaviour
     [SerializeField]
     private GameObject m_Square;
 
+    [SerializeField]
+    private GameObject m_Piece;
+
     int m_Length = 8;
 
     public void InitializeBoard()
@@ -18,13 +21,6 @@ public class SquareGenerator : MonoBehaviour
             var column = i / m_Length;
             var position = new Vector3(row, 0, column);
             var square = Instantiate(m_Square, position, Quaternion.identity, transform);
-            //square.Initialize(new Vector2Int(row, column));
-
-            // チェック柄作成 とりあえず色変えで誤魔化し
-            //if ((row + (column % 2)) % 2 == 1)
-            //{
-            //    square.GetComponent<Renderer>().material.color = Color.black;
-            //}
         }
     }
 
@@ -32,11 +28,5 @@ public class SquareGenerator : MonoBehaviour
     void Start()
     {
         InitializeBoard();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
