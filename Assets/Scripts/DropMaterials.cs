@@ -40,7 +40,7 @@ public class DropMaterials : MonoBehaviour
         if (isDropping)
         {
             timer += Time.deltaTime;
-            if (timer >= 3.0f)
+            if (timer >= 2.0f)
             {
                 InitializePiece();
                 isDropping = false;

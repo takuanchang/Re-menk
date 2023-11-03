@@ -7,11 +7,11 @@ public class Piece : MonoBehaviour
 {
     // 表裏判定の許容誤差
     static float epsilon = 0.2f;
+
     // 駒の状態の種類
     public enum Status {Stand, Front, Back};
     private Rigidbody rb;
-
-    float explosion_param = 2.0f;
+    [SerializeField] private float m_explosionParam = 2.0f;
 
     // 表裏の判定
     public Status GetStatus()
@@ -60,15 +60,31 @@ public class Piece : MonoBehaviour
         }
     }
 
+    private Vector3 CalculateForce(Vector3 direction, float distance)
+    {
+        float magnification = m_explosionParam / distance;
+
+        return magnification * direction;
+    }
+
+    private Vector3 CalculateTorque(Vector3 direction, float distance)
+    {
+        float magnification = m_explosionParam / distance;
+
+        return magnification * direction;
+    }
+
     // 今だけ
     // 吹っ飛ぶ処理
     public void Explosion(Vector3 pos)
     {
         Vector3 vec = transform.position - pos;
-        float r = vec.magnitude;
+        float distance = vec.magnitude;
+
         vec.y += 5.0f;
-        rb.AddForce(explosion_param / (r * r * r) * vec, ForceMode.Impulse);
-        rb.AddTorque(explosion_param / (r * r * r) * new Vector3(vec.z, 0.0f, -vec.x), ForceMode.Impulse);
+
+        rb.AddForce(CalculateForce(vec.normalized, distance), ForceMode.Impulse);
+        rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
     public void UseGravity()
