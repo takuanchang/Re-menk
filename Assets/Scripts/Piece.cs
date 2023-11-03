@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// TODO: Front BackじゃなくてWhilte Blackにする
-
 public class Piece : MonoBehaviour
 {
     // 表裏判定の許容誤差
