@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+// TODO: Front BackじゃなくてWhilte Blackにする
+
 public class Piece : MonoBehaviour
 {
     // 表裏判定の許容誤差
@@ -91,5 +93,14 @@ public class Piece : MonoBehaviour
     {
         rb.useGravity = true;
         rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
+    }
+
+    // 削除用プログラムを雑に導入
+    private void Update()
+    {
+        if(transform.position.y < -100)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
