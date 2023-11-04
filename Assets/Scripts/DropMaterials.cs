@@ -51,12 +51,12 @@ public class DropMaterials : MonoBehaviour
 
         //x軸方向、z軸方向の入力を取得
         //Horizontal、水平、横方向のイメージ
-        var _input_x = Input.GetAxisRaw("Horizontal");
+        var inputX = Input.GetAxisRaw("Horizontal");
         //Vertical、垂直、縦方向のイメージ
-        var _input_z = Input.GetAxisRaw("Vertical");
+        var inputZ = Input.GetAxisRaw("Vertical");
 
         //移動の向きなど座標関連はVector3で扱う
-        Vector3 velocity = new Vector3(_input_x, 0, _input_z);
+        Vector3 velocity = new Vector3(inputX, 0, inputZ);
         //ベクトルの向きを取得
         Vector3 direction = velocity.normalized;
 
