@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityEngine.UI;
 
-// TODO: Front BackじゃなくてWhilte Blackにする
 
 public class FrontBackCounter : MonoBehaviour
 {
@@ -29,13 +27,21 @@ public class FrontBackCounter : MonoBehaviour
         // 余裕があればもっと賢い方法に切り替える
         for (int i = 0; i < piecesNum; i++)
         {
-            switch (dropperTransform.GetChild(i).GetComponent<Piece>().GetStatus())
+            var child = dropperTransform.GetChild(i);
+            if (!child.TryGetComponent<Piece>(out var piece)) {
+                continue;
+            }
+
+            // 確実にチームが更新される保証があるなら不要だが、念のためチームを更新
+            piece.UpdateTeam();
+
+            switch (piece.Team)
             {
-                case Piece.Status.Back:
+                case Team.White:
                     whiteCount++;
                     break;
 
-                case Piece.Status.Front:
+                case Team.Black:
                     blackCount++;
                     break;
 
