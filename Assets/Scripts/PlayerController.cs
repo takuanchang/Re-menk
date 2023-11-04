@@ -6,19 +6,27 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     private bool isBlack = true;
-    int remain_pieces;
 
     /// <summary>
     /// このプレイヤーが操作可能かどうか
     /// </summary>
     public bool IsPlayable { get; set; }
 
+    private int m_SquareLayerMask;
+
+    private int m_RemainingPieces = 32;
+
     [SerializeField]
     private Piece m_OriginPiece;
     private Piece m_Target;
 
-    public void InitializePiece()
+    public void PrepareNextPiece()
     {
+        if(m_RemainingPieces <= 0) {
+            return;
+        }
+        m_RemainingPieces--;
+
         var position = new Vector3(3.5f, 5.0f, 3.5f);
         if (isBlack)
         {
@@ -35,7 +43,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitializePiece();
+        m_SquareLayerMask = LayerMask.GetMask("Square");
+        PrepareNextPiece();
     }
 
     private bool isDropping = false;
@@ -50,7 +59,7 @@ public class PlayerController : MonoBehaviour
             timer += Time.deltaTime;
             if (timer >= 2.0f)
             {
-                InitializePiece();
+                PrepareNextPiece();
                 isDropping = false;
                 timer = 0.0f;
             }
@@ -67,9 +76,7 @@ public class PlayerController : MonoBehaviour
         {
             // マウスからレイを飛ばす
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            int layer_mask = 1 << 7;
-            RaycastHit hit;
-            if(Physics.Raycast(ray, out hit, 10.0f, layer_mask, QueryTriggerInteraction.Ignore))
+            if(Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
             {
                 Vector3 pos = hit.collider.transform.position;
                 pos.y = 5.0f;
