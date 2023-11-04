@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour
         {
             m_Target = Instantiate(m_OriginPiece, position, Quaternion.Euler(180, 0, 0), transform);
         }
+
+        IsPlayable = true;
     }
 
     // Start is called before the first frame update

@@ -382,9 +382,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f32181888cf3774a8d6edd69a525aa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_WhiteCounter: {fileID: 1747648436}
-  m_BlackCounter: {fileID: 1888963721}
-  m_Dropper: {fileID: 961579746}
+  m_WhiteCounter: {fileID: 1747648438}
+  m_BlackCounter: {fileID: 1888963723}
+  m_Dropper: {fileID: 624271411}
 --- !u!1 &961579746
 GameObject:
   m_ObjectHideFlags: 0
@@ -961,3 +961,4 @@ SceneRoots:
   - {fileID: 1305560712}
   - {fileID: 961579748}
   - {fileID: 624271413}
+  - {fileID: 794680595}
