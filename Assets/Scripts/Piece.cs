@@ -1,27 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-
-// TODO: Front BackじゃなくてWhilte Blackにする
 
 public class Piece : MonoBehaviour
 {
-    // 表裏判定の許容誤差
-    static float epsilon = 0.2f;
-
-    // 駒の状態の種類
-    public enum Status {Stand, Front, Back};
     private Rigidbody rb;
-    [SerializeField] private float m_explosionParam = 2.0f;
+    [SerializeField]
+    private float m_explosionParam = 2.0f;
 
-    // 表裏の判定
-    public Status GetStatus()
+    /// <summary>
+    /// 表裏判定の許容誤差
+    /// </summary>
+    static readonly float epsilon = 0.2f;
+
+    /// <summary>
+    /// 駒の属するチーム
+    /// </summary>
+    public Team Team { get; private set; } = Team.None;
+
+    /// <summary>
+    /// 駒の属するチームを更新する
+    /// </summary>
+    public void UpdateTeam()
     {
         Vector3 up = transform.up.normalized;
-        if (Mathf.Abs(up.y) < epsilon) return Status.Stand;
-        else if (up.y > 0.0f) return Status.Front;
-        else return Status.Back;
+        if (Mathf.Abs(up.y) < epsilon) {
+            Team = Team.None; // どちらともいえない
+        } else if (up.y > 0.0f) {
+            Team = Team.Black; // 表なら黒
+        } else {
+            Team = Team.White; // 裏なら白
+        }
     }
 
     // Start is called before the first frame update
@@ -30,8 +39,6 @@ public class Piece : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
     }
-
-    // Update is called once per frame
 
     // 本番はイベント実行時のみ呼ぶ
     public void GetColliders()
@@ -100,7 +107,7 @@ public class Piece : MonoBehaviour
     {
         if(transform.position.y < -100)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 }
