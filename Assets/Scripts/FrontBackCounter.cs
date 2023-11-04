@@ -8,9 +8,14 @@ using UnityEngine.UI;
 
 public class FrontBackCounter : MonoBehaviour
 {
-    [SerializeField] private GameObject m_WhiteCounter;
-    [SerializeField] private GameObject m_BlackCounter;
-    [SerializeField] private GameObject m_Dropper;
+    [SerializeField]
+    private Text m_WhiteCounter;
+
+    [SerializeField]
+    private Text m_BlackCounter;
+
+    [SerializeField]
+    private GameObject m_Dropper;
 
     private (int, int) CountFrontBack()
     {
@@ -48,7 +53,7 @@ public class FrontBackCounter : MonoBehaviour
         // フレーム毎に白黒の枚数を数えている
         (int white, int black) countNum = CountFrontBack();
 
-        m_WhiteCounter.GetComponent<Text>().text = countNum.white.ToString();
-        m_BlackCounter.GetComponent<Text>().text = countNum.black.ToString();
+        m_WhiteCounter.text = countNum.white.ToString();
+        m_BlackCounter.text = countNum.black.ToString();
     }
 }
