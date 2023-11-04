@@ -13,12 +13,12 @@ public class FrontBackCounter : MonoBehaviour
     private Text m_BlackCounter;
 
     [SerializeField]
-    private GameObject m_Dropper;
+    private GameObject m_PiecesCollector;
 
     private (int, int) CountFrontBack()
     {
-        var dropperTransform = m_Dropper.transform;
-        var piecesNum = dropperTransform.childCount;
+        var collectorTransform = m_PiecesCollector.transform;
+        var piecesNum = collectorTransform.childCount;
 
         int whiteCount = 0;
         int blackCount = 0;
@@ -27,7 +27,7 @@ public class FrontBackCounter : MonoBehaviour
         // 余裕があればもっと賢い方法に切り替える
         for (int i = 0; i < piecesNum; i++)
         {
-            var child = dropperTransform.GetChild(i);
+            var child = collectorTransform.GetChild(i);
             if (!child.TryGetComponent<Piece>(out var piece)) {
                 continue;
             }

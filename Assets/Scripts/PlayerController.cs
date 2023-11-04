@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     private Piece m_OriginPiece;
     private Piece m_Target;
 
+    [SerializeField]
+    private GameObject m_PiecesCollector;
+
     public void PrepareNextPiece()
     {
         if(m_RemainingPieces <= 0) {
@@ -30,11 +33,11 @@ public class PlayerController : MonoBehaviour
         var position = new Vector3(3.5f, 5.0f, 3.5f);
         if (isBlack)
         {
-            m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
+            m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
         }
         else
         {
-            m_Target = Instantiate(m_OriginPiece, position, Quaternion.Euler(180, 0, 0), transform);
+            m_Target = Instantiate(m_OriginPiece, position, Quaternion.Euler(180, 0, 0), m_PiecesCollector.transform);
         }
 
         IsPlayable = true;
