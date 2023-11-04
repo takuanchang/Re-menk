@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private bool isBlack = true;
+    //[SerializeField]
+    //private bool isBlack = true;
+    public Team Team { get; set; } = Team.None;
 
     /// <summary>
     /// このプレイヤーが操作可能かどうか
     /// </summary>
-    public bool IsPlayable { get; set; }
+    public bool IsPlayable { get; private set; } = false;
 
     private int m_SquareLayerMask;
 
@@ -28,17 +29,23 @@ public class PlayerController : MonoBehaviour
         if(m_RemainingPieces <= 0) {
             return;
         }
-        m_RemainingPieces--;
 
         var position = new Vector3(3.5f, 5.0f, 3.5f);
-        if (isBlack)
+        if (Team == Team.Black)
         {
             m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
         }
-        else
+        else if (Team == Team.White)
         {
             m_Target = Instantiate(m_OriginPiece, position, Quaternion.Euler(180, 0, 0), m_PiecesCollector.transform);
         }
+        else
+        {
+            m_Target = null; // 万が一Team.Noneの場合
+            m_RemainingPieces++; // 万が一生成出来なければ減らさない調整用、後で消すかも
+        }
+
+        m_RemainingPieces--;
 
         IsPlayable = true;
     }
@@ -47,27 +54,27 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         m_SquareLayerMask = LayerMask.GetMask("Square");
-        PrepareNextPiece();
+        // PrepareNextPiece();
     }
 
-    private bool isDropping = false;
-    float timer = 0.0f;
+    // private bool isDropping = false;
+    // float timer = 0.0f;
 
     // Update is called once per frame
     void Update()
     {
         //要調整
-        if (isDropping)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 2.0f)
-            {
-                PrepareNextPiece();
-                isDropping = false;
-                timer = 0.0f;
-            }
-            return;
-        }
+        //if (isDropping)
+        //{
+        //    timer += Time.deltaTime;
+        //    if (timer >= 2.0f)
+        //    {
+        //        PrepareNextPiece();
+        //        isDropping = false;
+        //        timer = 0.0f;
+        //    }
+        //    return;
+        //}
         //要調整
         if (!IsPlayable)
         {
@@ -98,16 +105,8 @@ public class PlayerController : MonoBehaviour
         m_Target.transform.position = pos;
         m_Target.UseGravity();
         m_Target = null;
-        isDropping = true;
+        //isDropping = true;
+        IsPlayable = false;
         return;
-    }
-
-    public void SetBlack()
-    {
-        isBlack = true;
-    }
-    public void SetWhite()
-    {
-        isBlack = false;
     }
 }

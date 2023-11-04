@@ -105,7 +105,7 @@ public class Piece : MonoBehaviour
     // 削除用プログラムを雑に導入
     private void Update()
     {
-        if(transform.position.y < -100)
+        if(transform.position.y < -10)
         {
             Destroy(gameObject);
         }
