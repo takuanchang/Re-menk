@@ -16,19 +16,9 @@ public class DropMaterials : MonoBehaviour
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
     }
 
-    // test用(初期配置する)
-    public void test()
-    {
-        var position = new Vector3((float)4.5, 2, (float)5.5);
-        m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
-        m_Target.UseGravity();
-        m_Target = null;
-    }
-
     // Start is called before the first frame update
     void Start()
     {
-        //test();
         InitializePiece();
     }
 
@@ -61,12 +51,12 @@ public class DropMaterials : MonoBehaviour
 
         //x軸方向、z軸方向の入力を取得
         //Horizontal、水平、横方向のイメージ
-        var _input_x = Input.GetAxisRaw("Horizontal");
+        var inputX = Input.GetAxisRaw("Horizontal");
         //Vertical、垂直、縦方向のイメージ
-        var _input_z = Input.GetAxisRaw("Vertical");
+        var inputZ = Input.GetAxisRaw("Vertical");
 
         //移動の向きなど座標関連はVector3で扱う
-        Vector3 velocity = new Vector3(_input_x, 0, _input_z);
+        Vector3 velocity = new Vector3(inputX, 0, inputZ);
         //ベクトルの向きを取得
         Vector3 direction = velocity.normalized;
 
