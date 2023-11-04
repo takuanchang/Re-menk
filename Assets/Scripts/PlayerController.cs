@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : MonoBehaviour
 {
-    private bool isYourTurn = true;
     [SerializeField]
     private bool isBlack = true;
     int remain_pieces;
+
+    /// <summary>
+    /// このプレイヤーが操作可能かどうか
+    /// </summary>
+    public bool IsPlayable { get; set; }
 
     [SerializeField]
     private Piece m_OriginPiece;
@@ -16,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     public void InitializePiece()
     {
-        var position = new Vector3((float)3.5, 5, (float)3.5);
+        var position = new Vector3(3.5f, 5.0f, 3.5f);
         if (isBlack)
         {
             m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, transform);
@@ -35,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isDropping = false;
     float timer = 0.0f;
+
     // Update is called once per frame
     void Update()
     {
@@ -51,7 +55,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
         //要調整
-        if (!isYourTurn)
+        if (!IsPlayable)
         {
             return;
         }
@@ -72,7 +76,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     public void Drop(Vector3 pos)
     {
         if (m_Target == null)
@@ -87,14 +90,6 @@ public class PlayerController : MonoBehaviour
         return;
     }
 
-    public void SetTurnTrue()
-    {
-        isYourTurn = true;
-    }
-    public void SetTurnFalse()
-    {
-        isYourTurn = false;
-    }
     public void SetBlack()
     {
         isBlack = true;
