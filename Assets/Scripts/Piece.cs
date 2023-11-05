@@ -133,7 +133,7 @@ public class Piece : MonoBehaviour
 
     public bool IsStable()
     {
-        return rb.IsSleeping();
+        return rb.IsSleeping() || isDead;
     }
 
     private bool ShouldBeDisabled()
