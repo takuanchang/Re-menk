@@ -27,13 +27,19 @@ public class TurnManager : MonoBehaviour
     }
 
 
-    float timer = 0.0f;
+    private float timer = 0.0f;
+    private bool isTimer = false;
+
+    public void OnPieceThrown()
+    {
+        timer = 0.0f;
+        isTimer = true;
+    }
 
     // Update is called once per frame
     void Update()
     {
-        // 操作不可能→既に置いた、多分良くない実装
-        if (!playerControllers[currentPlayer].IsPlayable)
+        if (isTimer)
         {
             timer += Time.deltaTime;
             if (timer >= 2.0f)
@@ -41,6 +47,7 @@ public class TurnManager : MonoBehaviour
                 currentPlayer = (currentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
                 playerControllers[currentPlayer].PrepareNextPiece(); // 次のプレイヤーに準備させる
                 timer = 0.0f;
+                isTimer = false;
             }
             return;
         }
