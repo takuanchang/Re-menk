@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
+    private bool isDead = false;
     private Rigidbody rb;
+
     [SerializeField]
     private float m_explosionParam = 2.0f;
 
@@ -19,10 +23,50 @@ public class Piece : MonoBehaviour
     public Team Team { get; private set; } = Team.None;
 
     /// <summary>
+    /// 初期状態でどのチームに属しているかを与えて駒を初期化する
+    /// </summary>
+    /// <param name="initialTeam">初期状態のチーム</param>
+    public void Initialize(Team initialTeam) {
+        // 初期化時に無効なチームを設定しようとした場合はアサートする
+        Assert.AreNotEqual(initialTeam, Team.None, $"Do NOT set invalid teams at initialization");
+        // チームを設定する
+        Team = initialTeam;
+        // チームに応じて向きを設定する
+        switch (initialTeam)
+        {
+            // 黒は表向き
+            case Team.Black:
+                transform.rotation = Quaternion.identity;
+                break;
+
+            // 白は表向き
+            case Team.White:
+                transform.rotation = Quaternion.Euler(180, 0, 0);
+                break;
+
+            // その他はありえない
+            default:
+                break;
+        }
+
+        // 駒のRigidbodyを取得して重力を切る
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+
+        // フラグを切る
+        isDead = false;
+    }
+
+    /// <summary>
     /// 駒の属するチームを更新する
     /// </summary>
     public void UpdateTeam()
     {
+        if (isDead)
+        {
+            return;
+        }
+
         Vector3 up = transform.up.normalized;
         if (Mathf.Abs(up.y) < epsilon) {
             Team = Team.None; // どちらともいえない
@@ -33,14 +77,6 @@ public class Piece : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
-    }
-
-    // 本番はイベント実行時のみ呼ぶ
     public void GetColliders()
     {
         // 近くにあるコライダーを取得
@@ -83,7 +119,6 @@ public class Piece : MonoBehaviour
         return magnification * direction;
     }
 
-    // 今だけ
     // 吹っ飛ぶ処理
     public void Explosion(Vector3 pos)
     {
@@ -96,18 +131,36 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
-    public void UseGravity()
+    public void Shoot()
     {
         rb.useGravity = true;
         rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
     }
 
+    public bool IsStable()
+    {
+        return rb.IsSleeping() || isDead;
+    }
+
+    private bool ShouldBeDisabled()
+    {
+        return transform.position.y < -10;
+    }
+
+    // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
+    private void Kill()
+    {
+        isDead = true;
+        Team = Team.None;
+        gameObject.SetActive(false);
+    }
+
     // 削除用プログラムを雑に導入
     private void Update()
     {
-        if(transform.position.y < -100)
+        if(ShouldBeDisabled())
         {
-            Destroy(gameObject);
+            Kill();
         }
     }
 }

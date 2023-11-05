@@ -1,20 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private bool isBlack = true;
+    /// <summary>
+    /// このプレイヤーのチーム
+    /// </summary>
+    public Team Team { get; set; } = Team.None;
 
     /// <summary>
     /// このプレイヤーが操作可能かどうか
     /// </summary>
-    public bool IsPlayable { get; set; }
+    public bool IsPlayable { get; private set; } = false;
 
     private int m_SquareLayerMask;
 
-    private int m_RemainingPieces = 32;
+    public int m_RemainingPieces { get; private set; } = 32;
 
     [SerializeField]
     private Piece m_OriginPiece;
@@ -23,52 +28,43 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject m_PiecesCollector;
 
-    public void PrepareNextPiece()
+    [SerializeField]
+    private UnityEvent OnPieceThrown;
+
+    /// <summary>
+    /// 次の駒を用意してから操作可能にする
+    /// </summary>
+    public bool PrepareNextPiece()
     {
-        if(m_RemainingPieces <= 0) {
-            return;
+        // チーム未設定のまま駒を用意しようとした場合はアサートする
+        Assert.AreNotEqual(Team, Team.None, $"No Team has been set for this PlayerController.");
+
+        // 駒がないなら何もしない
+        if (m_RemainingPieces <= 0) {
+            return false;
         }
+
+        // 駒を用意する
+        var position = new Vector3(3.5f, 5.0f, 3.5f);
+        m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
+        m_Target.Initialize(Team);
+
         m_RemainingPieces--;
 
-        var position = new Vector3(3.5f, 5.0f, 3.5f);
-        if (isBlack)
-        {
-            m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
-        }
-        else
-        {
-            m_Target = Instantiate(m_OriginPiece, position, Quaternion.Euler(180, 0, 0), m_PiecesCollector.transform);
-        }
-
+        // 操作可能にする
         IsPlayable = true;
+        return true;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         m_SquareLayerMask = LayerMask.GetMask("Square");
-        PrepareNextPiece();
     }
-
-    private bool isDropping = false;
-    float timer = 0.0f;
 
     // Update is called once per frame
     void Update()
     {
-        //要調整
-        if (isDropping)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 2.0f)
-            {
-                PrepareNextPiece();
-                isDropping = false;
-                timer = 0.0f;
-            }
-            return;
-        }
-        //要調整
         if (!IsPlayable)
         {
             return;
@@ -85,6 +81,7 @@ public class PlayerController : MonoBehaviour
                 pos.y = 5.0f;
                 Drop(pos);
             }
+            OnPieceThrown.Invoke();
         }
     }
 
@@ -96,18 +93,9 @@ public class PlayerController : MonoBehaviour
             return;
         }
         m_Target.transform.position = pos;
-        m_Target.UseGravity();
+        m_Target.Shoot();
         m_Target = null;
-        isDropping = true;
+        IsPlayable = false;
         return;
-    }
-
-    public void SetBlack()
-    {
-        isBlack = true;
-    }
-    public void SetWhite()
-    {
-        isBlack = false;
     }
 }
