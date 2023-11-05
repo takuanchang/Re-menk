@@ -6,6 +6,7 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
+    private bool isDead = false;
     private Rigidbody rb;
     [SerializeField]
     private float m_explosionParam = 2.0f;
@@ -53,6 +54,11 @@ public class Piece : MonoBehaviour
     /// </summary>
     public void UpdateTeam()
     {
+        if (isDead)
+        {
+            return;
+        }
+
         Vector3 up = transform.up.normalized;
         if (Mathf.Abs(up.y) < epsilon) {
             Team = Team.None; // どちらともいえない
@@ -125,6 +131,24 @@ public class Piece : MonoBehaviour
         rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
     }
 
+    public bool IsStable()
+    {
+        return rb.IsSleeping();
+    }
+
+    private bool ShouldBeDisabled()
+    {
+        return transform.position.y < -10;
+    }
+
+    // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
+    private void Kill()
+    {
+        isDead = true;
+        Team = Team.None;
+        gameObject.SetActive(false);
+    }
+
 
     // 初期化処理
     private void Start() {
@@ -135,9 +159,9 @@ public class Piece : MonoBehaviour
     // 削除用プログラムを雑に導入
     private void Update()
     {
-        if(transform.position.y < -10)
+        if(ShouldBeDisabled())
         {
-            Destroy(gameObject);
+            Kill();
         }
     }
 }
