@@ -61,9 +61,13 @@ public class TurnManager : MonoBehaviour
         }
         else
         {
-            // リザルト移行関数を記述
-
+            GoToResult();
             return;
         }
+    }
+
+    void GoToResult()
+    {
+        Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     }
 }
