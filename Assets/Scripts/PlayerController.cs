@@ -25,8 +25,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private GameObject m_PiecesCollector;
-    [SerializeField]
-    private SteadyState m_State;
+
+    //[SerializeField]
+    //private SteadyState m_State;
 
     /// <summary>
     /// 次の駒を用意してから操作可能にする
@@ -46,7 +47,7 @@ public class PlayerController : MonoBehaviour
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
         m_Target.Initialize(Team);
         // 参照先を保存
-        m_State.SetRigidbody(m_Target.GetComponent<Rigidbody>());
+        // m_State.SetRigidbody(m_Target.GetComponent<Rigidbody>());
 
         m_RemainingPieces--;
 
