@@ -43,7 +43,7 @@ public class DropMaterials : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            m_Target.UseGravity();
+            m_Target.Shoot();
             m_Target = null;
             isDropping = true;
             return;

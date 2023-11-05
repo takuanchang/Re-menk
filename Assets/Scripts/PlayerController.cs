@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
         m_Target.transform.position = pos;
-        m_Target.UseGravity();
+        m_Target.Shoot();
         m_Target = null;
         IsPlayable = false;
         return;

@@ -125,7 +125,7 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
-    public void UseGravity()
+    public void Shoot()
     {
         rb.useGravity = true;
         rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
