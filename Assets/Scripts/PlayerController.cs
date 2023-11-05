@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     private int m_SquareLayerMask;
 
-    private int m_RemainingPieces = 32;
+    public int m_RemainingPieces { get; private set; } = 32;
 
     [SerializeField]
     private Piece m_OriginPiece;
@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private GameObject m_PiecesCollector;
+    [SerializeField]
+    private SteadyState m_State;
 
     /// <summary>
     /// 次の駒を用意してから操作可能にする
@@ -43,6 +45,9 @@ public class PlayerController : MonoBehaviour
         var position = new Vector3(3.5f, 5.0f, 3.5f);
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
         m_Target.Initialize(Team);
+        // 参照先を保存
+        m_State.SetRigidbody(m_Target.GetComponent<Rigidbody>());
+
         m_RemainingPieces--;
 
         // 操作可能にする

@@ -127,7 +127,7 @@ public class Piece : MonoBehaviour
 
 
     // 初期化処理
-    private　void Start() {
+    private void Start() {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
     }

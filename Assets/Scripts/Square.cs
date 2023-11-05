@@ -6,6 +6,7 @@ public class Square : MonoBehaviour
 {
     static private float ep = 5.0f;
 
+    /*
     // Start is called before the first frame update
     void Start()
     {
@@ -17,6 +18,7 @@ public class Square : MonoBehaviour
     {
         
     }
+    */
 
     private void OnCollisionEnter(Collision collision)
     {
