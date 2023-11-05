@@ -34,14 +34,14 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// 次の駒を用意してから操作可能にする
     /// </summary>
-    public void PrepareNextPiece()
+    public bool PrepareNextPiece()
     {
         // チーム未設定のまま駒を用意しようとした場合はアサートする
         Assert.AreNotEqual(Team, Team.None, $"No Team has been set for this PlayerController.");
 
         // 駒がないなら何もしない
         if (m_RemainingPieces <= 0) {
-            return;
+            return false;
         }
 
         // 駒を用意する
@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour
 
         // 操作可能にする
         IsPlayable = true;
+        return true;
     }
 
     // Start is called before the first frame update

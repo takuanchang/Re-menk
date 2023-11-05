@@ -44,11 +44,25 @@ public class TurnManager : MonoBehaviour
             timer += Time.deltaTime;
             if (timer >= 2.0f)
             {
-                currentPlayer = (currentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
-                playerControllers[currentPlayer].PrepareNextPiece(); // 次のプレイヤーに準備させる
+                PlayerChange();
                 timer = 0.0f;
                 isTimer = false;
             }
+            return;
+        }
+    }
+
+    void PlayerChange()
+    {
+        currentPlayer = (currentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
+        if (playerControllers[currentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
+        {
+            return;
+        }
+        else
+        {
+            // リザルト移行関数を記述
+
             return;
         }
     }
