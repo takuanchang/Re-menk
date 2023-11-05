@@ -7,7 +7,7 @@ public class TitleUI : MonoBehaviour
 {
     public void ChangeToGameScene()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("Main");
     }
 
     public void ExitGame()
