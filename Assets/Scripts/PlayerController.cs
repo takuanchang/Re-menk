@@ -48,8 +48,6 @@ public class PlayerController : MonoBehaviour
         var position = new Vector3(3.5f, 5.0f, 3.5f);
         m_Target = Instantiate(m_OriginPiece, position, Quaternion.identity, m_PiecesCollector.transform);
         m_Target.Initialize(Team);
-        // 参照先を保存
-        // m_State.SetRigidbody(m_Target.GetComponent<Rigidbody>());
 
         m_RemainingPieces--;
 

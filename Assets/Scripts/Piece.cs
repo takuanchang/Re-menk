@@ -77,7 +77,6 @@ public class Piece : MonoBehaviour
         }
     }
 
-    // 本番はイベント実行時のみ呼ぶ
     public void GetColliders()
     {
         // 近くにあるコライダーを取得
@@ -120,7 +119,6 @@ public class Piece : MonoBehaviour
         return magnification * direction;
     }
 
-    // 今だけ
     // 吹っ飛ぶ処理
     public void Explosion(Vector3 pos)
     {

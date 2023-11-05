@@ -55,7 +55,6 @@ public class FrontBackCounter : MonoBehaviour
 
     void Update()
     {
-        // バカ
         // フレーム毎に白黒の枚数を数えている
         (int white, int black) countNum = CountFrontBack();
 
