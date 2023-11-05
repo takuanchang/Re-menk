@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
@@ -9,6 +10,14 @@ public class TurnManager : MonoBehaviour
 
     [SerializeField]
     private PlayerController[] playerControllers = new PlayerController[numPlayer];
+
+    [SerializeField]
+    private GameObject m_ResultUI;
+    [SerializeField]
+    private Text m_ResultText;
+
+    [SerializeField]
+    private FrontBackCounter m_FrontBackCounter;
 
     public void InitializePlayer()
     {
@@ -68,6 +77,24 @@ public class TurnManager : MonoBehaviour
 
     void GoToResult()
     {
-        Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        m_ResultUI.SetActive(true);
+
+        (int white, int black) count = m_FrontBackCounter.CountFrontBack();
+
+
+        string result = "";
+        if(count.white < count.black)
+        {
+            result = "Black Win!";
+        }
+        else if(count.black < count.white)
+        {
+            result = "White Win!";
+        }
+        else
+        {
+            result = "Draw";
+        }
+        m_ResultText.text = result;
     }
 }

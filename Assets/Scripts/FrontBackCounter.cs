@@ -15,7 +15,7 @@ public class FrontBackCounter : MonoBehaviour
     [SerializeField]
     private GameObject m_PiecesCollector;
 
-    private (int, int) CountFrontBack()
+    public (int, int) CountFrontBack()
     {
         var collectorTransform = m_PiecesCollector.transform;
         var piecesNum = collectorTransform.childCount;
