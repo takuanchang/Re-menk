@@ -8,6 +8,7 @@ public class Piece : MonoBehaviour
 {
     private bool isDead = false;
     private Rigidbody rb;
+
     [SerializeField]
     private float m_explosionParam = 2.0f;
 
@@ -47,6 +48,13 @@ public class Piece : MonoBehaviour
             default:
                 break;
         }
+
+        // 駒のRigidbodyを取得して重力を切る
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+
+        // フラグを切る
+        isDead = false;
     }
 
     /// <summary>
@@ -147,13 +155,6 @@ public class Piece : MonoBehaviour
         isDead = true;
         Team = Team.None;
         gameObject.SetActive(false);
-    }
-
-
-    // 初期化処理
-    private void Start() {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
     }
 
     // 削除用プログラムを雑に導入
