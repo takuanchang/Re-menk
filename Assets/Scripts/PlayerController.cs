@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,8 +28,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private GameObject m_PiecesCollector;
 
-    //[SerializeField]
-    //private SteadyState m_State;
+    [SerializeField]
+    private UnityEvent OnPieceThrown;
 
     /// <summary>
     /// 次の駒を用意してから操作可能にする
@@ -80,6 +82,7 @@ public class PlayerController : MonoBehaviour
                 pos.y = 5.0f;
                 Drop(pos);
             }
+            OnPieceThrown.Invoke();
         }
     }
 
