@@ -2,9 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class TitleUI : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject m_RaycastGuard = null;
+    [SerializeField]
+    private GameObject m_HowToPlayPanel = null;
+    [SerializeField]
+    private GameObject m_SettingsPanel = null;
+
     public void ChangeToGameScene()
     {
         SceneManager.LoadScene("Main");
@@ -22,25 +30,48 @@ public class TitleUI : MonoBehaviour
 
     public void ShowHowTo()
     {
+        if (m_RaycastGuard == null|| m_HowToPlayPanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(true);
+        m_HowToPlayPanel.SetActive(true);
         return;
     }
 
     public void HideHowTo()
     {
+        if (m_RaycastGuard == null || m_HowToPlayPanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(false);
+        m_HowToPlayPanel.SetActive(false);
         return;
     }
 
-    public void OpenSettings()
+    public void ShowSettings()
     {
+        if (m_RaycastGuard == null || m_SettingsPanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(true);
+        m_SettingsPanel.SetActive(true);
         // 音量
         // 画質
         // 見た目(スキン選べると楽しい)
-
         return;
     }
 
-    public void CloseSettings()
+    public void HideSettings()
     {
+        if (m_RaycastGuard == null || m_SettingsPanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(false);
+        m_SettingsPanel.SetActive(false);
         return;
     }
 }
