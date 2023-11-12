@@ -80,8 +80,8 @@ public class PlayerController : MonoBehaviour
                 Vector3 pos = hit.collider.transform.position;
                 pos.y = 5.0f;
                 Drop(pos);
+                OnPieceThrown.Invoke();
             }
-            OnPieceThrown.Invoke();
         }
     }
 
