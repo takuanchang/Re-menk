@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerController : MonoBehaviour
 {
@@ -53,6 +55,7 @@ public class PlayerController : MonoBehaviour
 
         // 操作可能にする
         IsPlayable = true;
+        phase = Phase.SquareSelect;
         return true;
     }
 
@@ -62,6 +65,22 @@ public class PlayerController : MonoBehaviour
         m_SquareLayerMask = LayerMask.GetMask("Square");
     }
 
+
+    enum Phase {
+        SquareSelect,
+        //MoveCamera,
+        ButtonUpWait,
+        PieceThrow
+    }
+
+    private Phase phase = Phase.SquareSelect;
+    private Vector3 targetPosition = Vector3.zero;
+    private Queue<Tuple<float, Vector3>> mouseHistory = new Queue<Tuple<float, Vector3>>();
+    private float sumTime = 0.0f;
+    // 閾値
+    static readonly float threshold = 0.3f;
+
+
     // Update is called once per frame
     void Update()
     {
@@ -69,23 +88,93 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-
-        // 選択したマスに落とす
-        if (Input.GetMouseButtonDown(0))
+        switch (phase)
         {
-            // マウスからレイを飛ばす
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
-            {
-                Vector3 pos = hit.collider.transform.position;
-                pos.y = 5.0f;
-                Drop(pos);
-                OnPieceThrown.Invoke();
-            }
+            // マス選択フェーズ
+            case Phase.SquareSelect:
+                // マウスからレイを飛ばす
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
+                {
+                    Vector3 pos = hit.collider.transform.position;
+                    pos.y = 3.0f;
+                    m_Target.transform.position = pos;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    phase = Phase.ButtonUpWait;
+                }
+                break;
+            // マウス押し直し待ち
+            case Phase.ButtonUpWait:
+                if (Input.GetMouseButtonDown(1))
+                {
+                    phase = Phase.SquareSelect;
+                    break;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    sumTime = 0.0f;
+                    mouseHistory.Clear();
+                    targetPosition = Input.mousePosition;
+                    phase = Phase.PieceThrow;
+                }
+                break;
+            // 投げるフェーズ
+            case Phase.PieceThrow:
+                if (Input.GetMouseButtonDown(1))
+                {
+                    phase = Phase.SquareSelect;
+                    break;
+                }
+
+                float dt = Time.deltaTime;
+                sumTime += dt;
+                mouseHistory.Enqueue(Tuple.Create(dt, Input.mousePosition));
+                while(sumTime - mouseHistory.Peek().Item1 > threshold)
+                {
+                    var p = mouseHistory.Dequeue();
+                    sumTime -= p.Item1;
+                }
+                Debug.Log(mouseHistory.Count);
+                if (Input.GetMouseButtonUp(0))
+                {
+                    //Throw(pos);
+                    //OnPieceThrown.Invoke();
+                }
+                break;
         }
+
+        //// 選択したマスに落とす
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    // マウスからレイを飛ばす
+        //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //    if(Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
+        //    {
+        //        Vector3 pos = hit.collider.transform.position;
+        //        pos.y = 5.0f;
+        //        Drop(pos);
+        //        OnPieceThrown.Invoke();
+        //    }
+        //}
     }
 
-    public void Drop(Vector3 pos)
+    //public void Drop(Vector3 pos)
+    //{
+    //    if (m_Target == null)
+    //    {
+    //        Debug.Log("Error");
+    //        return;
+    //    }
+    //    m_Target.transform.position = pos;
+    //    m_Target.Shoot();
+    //    m_Target = null;
+    //    IsPlayable = false;
+    //    return;
+    //}
+
+    public void Throw(Vector3 pos)
     {
         if (m_Target == null)
         {
