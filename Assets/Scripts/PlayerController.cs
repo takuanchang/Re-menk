@@ -136,9 +136,9 @@ public class PlayerController : MonoBehaviour
                     var p = mouseHistory.Dequeue();
                     sumTime -= p.Item1;
                 }
-                Debug.Log(mouseHistory.Count);
                 if (Input.GetMouseButtonUp(0))
                 {
+                    Debug.Log(CalculateSpeed(ref mouseHistory));
                     //Throw(pos);
                     //OnPieceThrown.Invoke();
                 }
@@ -173,6 +173,28 @@ public class PlayerController : MonoBehaviour
     //    IsPlayable = false;
     //    return;
     //}
+
+
+    private float speedParam = 1.0f;
+    private float CalculateSpeed(ref Queue<Tuple<float, Vector3>> history)
+    {
+        float speed = 0.0f;
+        var preHistory = history.Peek();
+        bool isFirst = true;
+        foreach(var p in history)
+        {
+            if (isFirst)
+            {
+                isFirst = false;
+                continue;
+            }
+            float dTime = p.Item1 - preHistory.Item1;
+            speed += (p.Item2 - preHistory.Item2).magnitude / dTime;
+            preHistory = p;
+        }
+        speed /= (float)history.Count - 1.0f;
+        return speed * speedParam;
+    }
 
     public void Throw(Vector3 pos)
     {
