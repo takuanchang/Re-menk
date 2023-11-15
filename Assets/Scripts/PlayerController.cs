@@ -188,8 +188,7 @@ public class PlayerController : MonoBehaviour
                 isFirst = false;
                 continue;
             }
-            float dTime = p.Item1 - preHistory.Item1;
-            speed += (p.Item2 - preHistory.Item2).magnitude / dTime;
+            speed += (p.Item2 - preHistory.Item2).magnitude / p.Item1;
             preHistory = p;
         }
         speed /= (float)history.Count - 1.0f;
