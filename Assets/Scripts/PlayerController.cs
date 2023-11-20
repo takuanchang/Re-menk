@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
     private Queue<Tuple<float, Vector3>> mouseHistory = new Queue<Tuple<float, Vector3>>();
     private float sumTime = 0.0f;
     // 閾値
-    static readonly float threshold = 0.3f;
+    static readonly float threshold = 0.1f;
 
 
     // Update is called once per frame
@@ -130,7 +130,8 @@ public class PlayerController : MonoBehaviour
 
                 float dt = Time.deltaTime;
                 sumTime += dt;
-                mouseHistory.Enqueue(Tuple.Create(dt, Input.mousePosition));
+                var mousePos = Input.mousePosition;
+                mouseHistory.Enqueue(Tuple.Create(dt, mousePos));
                 while(sumTime - mouseHistory.Peek().Item1 > threshold)
                 {
                     var p = mouseHistory.Dequeue();
@@ -138,9 +139,10 @@ public class PlayerController : MonoBehaviour
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    Debug.Log(CalculateSpeed(ref mouseHistory));
-                    //Throw(pos);
-                    //OnPieceThrown.Invoke();
+                    var dir = CalcurateDirection(mousePos);
+                    dir.y = CalculateSpeed(mouseHistory);
+                    Throw(dir);
+                    OnPieceThrown.Invoke();
                 }
                 break;
         }
@@ -174,36 +176,42 @@ public class PlayerController : MonoBehaviour
     //    return;
     //}
 
+    float directionParam = 3.0f;
+    private Vector3 CalcurateDirection(Vector3 mousePos)
+    {
+        var gap = mousePos - targetPosition;
+        gap /= MathF.Min(Screen.width, Screen.height);
+        gap *= directionParam;
+        gap.z = gap.y;
+        gap.y = 0.0f;
+        return gap;
+    }
 
+    [SerializeField]
     private float speedParam = 1.0f;
-    private float CalculateSpeed(ref Queue<Tuple<float, Vector3>> history)
+    private float CalculateSpeed(Queue<Tuple<float, Vector3>> history)
     {
         float speed = 0.0f;
-        var preHistory = history.Peek();
-        bool isFirst = true;
-        foreach(var p in history)
+        var length = MathF.Min(Screen.width, Screen.height);
+        var (predt, prePos) = history.Dequeue();
+        foreach(var (dt, pos) in history)
         {
-            if (isFirst)
-            {
-                isFirst = false;
-                continue;
-            }
-            speed += (p.Item2 - preHistory.Item2).magnitude / p.Item1;
-            preHistory = p;
+            var deltaPos = (pos - prePos) / length;
+            speed += MathF.Sign(deltaPos.y) * deltaPos.magnitude / dt;
+            (predt, prePos) = (dt, pos);
         }
-        speed /= (float)history.Count - 1.0f;
+        speed /= (float)history.Count;
         return speed * speedParam;
     }
 
-    public void Throw(Vector3 pos)
+    public void Throw(Vector3 dir)
     {
         if (m_Target == null)
         {
             Debug.Log("Error");
             return;
         }
-        m_Target.transform.position = pos;
-        m_Target.Shoot();
+        m_Target.Shoot(dir);
         m_Target = null;
         IsPlayable = false;
         return;

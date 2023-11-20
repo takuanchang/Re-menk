@@ -131,10 +131,10 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
-    public void Shoot()
+    public void Shoot(Vector3 dir)
     {
         rb.useGravity = true;
-        rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
+        rb.AddForce(dir, ForceMode.Impulse);
     }
 
     public bool IsStable()
