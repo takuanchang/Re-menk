@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private UnityEvent OnPieceThrown;
 
-    enum Phase {
+    public enum Phase {
         SquareSelect,
         //MoveCamera,
         ButtonUpWait,
@@ -86,6 +86,12 @@ public class PlayerController : MonoBehaviour
     }
 
     private Phase m_Phase = Phase.SquareSelect;
+
+    public Phase CurrentPhase
+    {
+        get => m_Phase;
+    }
+
     private Vector3 targetPosition = Vector3.zero;
     private Queue<MouseLog> m_MouseHistory = new();
     private float sumTime = 0.0f;

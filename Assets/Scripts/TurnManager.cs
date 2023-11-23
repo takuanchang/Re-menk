@@ -2,11 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Assertions;
 
 public class TurnManager : MonoBehaviour
 {
     private const int numPlayer = 2;
-    private int currentPlayer;
+    private int m_currentPlayer = 0;
+
+    public int CurrentPlayer
+    {
+        get => m_currentPlayer;
+
+        private set
+        {
+            Assert.IsTrue(0 <= value && value <= numPlayer, $"Range error : CurrentPlayer {value}");
+
+            m_currentPlayer = value;
+        }
+    }
 
     [SerializeField]
     private PlayerController[] playerControllers = new PlayerController[numPlayer];
@@ -22,11 +35,11 @@ public class TurnManager : MonoBehaviour
     public void InitializePlayer()
     {
         // リバーシは黒が先行
-        currentPlayer = 0;
-        playerControllers[currentPlayer].Team = Team.Black;
-        playerControllers[currentPlayer].PrepareNextPiece();
+        CurrentPlayer = 0;
+        playerControllers[CurrentPlayer].Team = Team.Black;
+        playerControllers[CurrentPlayer].PrepareNextPiece();
 
-        playerControllers[(currentPlayer + 1) % numPlayer].Team = Team.White;
+        playerControllers[(CurrentPlayer + 1) % numPlayer].Team = Team.White;
     }
 
     // Start is called before the first frame update
@@ -63,8 +76,8 @@ public class TurnManager : MonoBehaviour
 
     void PlayerChange()
     {
-        currentPlayer = (currentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
-        if (playerControllers[currentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
+        CurrentPlayer = (CurrentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
+        if (playerControllers[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
             return;
         }
