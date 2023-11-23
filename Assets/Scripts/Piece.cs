@@ -52,6 +52,7 @@ public class Piece : MonoBehaviour
         // 駒のRigidbodyを取得して重力を切る
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
 
         // フラグを切る
         isDead = false;
@@ -135,6 +136,7 @@ public class Piece : MonoBehaviour
     public void Shoot(Vector3 dir)
     {
         rb.useGravity = true;
+        rb.constraints = RigidbodyConstraints.None;
         rb.AddForce(dir, ForceMode.Impulse);
     }
 
