@@ -77,11 +77,12 @@ public class Piece : MonoBehaviour
         }
     }
 
+    private float radius = 2.0f;
     public void GetColliders()
     {
         // 近くにあるコライダーを取得
         Collider[] hitColliders = new Collider[1000];
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, 4.01f, hitColliders);
+        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, radius, hitColliders);
         for (int i = 0; i < numColliders; i++)
         {
             // 自分以外の駒の時
@@ -107,14 +108,14 @@ public class Piece : MonoBehaviour
 
     private Vector3 CalculateForce(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
     private Vector3 CalculateTorque(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
