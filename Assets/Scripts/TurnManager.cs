@@ -64,15 +64,16 @@ public class TurnManager : MonoBehaviour
     {
         m_ResultUI.SetActive(true);
 
-        (int white, int black) count = m_FrontBackCounter.CountFrontBack();
+        //(int white, int black) count = m_FrontBackCounter.CountFrontBack();
+        var (white, black) = m_FrontBackCounter.CountFrontBack();
 
 
         string result = "";
-        if(count.white < count.black)
+        if(white < black)
         {
             result = "Black Win!";
         }
-        else if(count.black < count.white)
+        else if(black < white)
         {
             result = "White Win!";
         }

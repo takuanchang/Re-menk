@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
-    private bool isDead = false;
+    private bool m_isDead = false;
     private Rigidbody rb;
 
     [SerializeField]
@@ -15,7 +15,7 @@ public class Piece : MonoBehaviour
     /// <summary>
     /// 表裏判定の許容誤差
     /// </summary>
-    static readonly float epsilon = 0.2f;
+    static readonly float Epsilon = 0.2f;
 
     /// <summary>
     /// 駒の属するチーム
@@ -55,7 +55,7 @@ public class Piece : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeAll;
 
         // フラグを切る
-        isDead = false;
+        m_isDead = false;
     }
 
     /// <summary>
@@ -63,13 +63,13 @@ public class Piece : MonoBehaviour
     /// </summary>
     public void UpdateTeam()
     {
-        if (isDead)
+        if (m_isDead)
         {
             return;
         }
 
         Vector3 up = transform.up.normalized;
-        if (Mathf.Abs(up.y) < epsilon) {
+        if (Mathf.Abs(up.y) < Epsilon) {
             Team = Team.None; // どちらともいえない
         } else if (up.y > 0.0f) {
             Team = Team.Black; // 表なら黒
@@ -142,7 +142,7 @@ public class Piece : MonoBehaviour
 
     public bool IsStable()
     {
-        return rb.IsSleeping() || isDead;
+        return rb.IsSleeping() || m_isDead;
     }
 
     private bool ShouldBeDisabled()
@@ -153,7 +153,7 @@ public class Piece : MonoBehaviour
     // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
     private void Kill()
     {
-        isDead = true;
+        m_isDead = true;
         Team = Team.None;
         gameObject.SetActive(false);
     }
