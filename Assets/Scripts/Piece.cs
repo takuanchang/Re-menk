@@ -6,7 +6,9 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
+    private bool isDead = false;
     private Rigidbody rb;
+
     [SerializeField]
     private float m_explosionParam = 2.0f;
 
@@ -46,6 +48,14 @@ public class Piece : MonoBehaviour
             default:
                 break;
         }
+
+        // 駒のRigidbodyを取得して重力を切る
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+
+        // フラグを切る
+        isDead = false;
     }
 
     /// <summary>
@@ -53,6 +63,11 @@ public class Piece : MonoBehaviour
     /// </summary>
     public void UpdateTeam()
     {
+        if (isDead)
+        {
+            return;
+        }
+
         Vector3 up = transform.up.normalized;
         if (Mathf.Abs(up.y) < epsilon) {
             Team = Team.None; // どちらともいえない
@@ -63,12 +78,12 @@ public class Piece : MonoBehaviour
         }
     }
 
-    // 本番はイベント実行時のみ呼ぶ
+    private float radius = 2.0f;
     public void GetColliders()
     {
         // 近くにあるコライダーを取得
         Collider[] hitColliders = new Collider[1000];
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, 4.01f, hitColliders);
+        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, radius, hitColliders);
         for (int i = 0; i < numColliders; i++)
         {
             // 自分以外の駒の時
@@ -94,19 +109,18 @@ public class Piece : MonoBehaviour
 
     private Vector3 CalculateForce(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
     private Vector3 CalculateTorque(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
-    // 今だけ
     // 吹っ飛ぶ処理
     public void Explosion(Vector3 pos)
     {
@@ -119,25 +133,37 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
-    public void UseGravity()
+    public void Shoot(Vector3 dir)
     {
         rb.useGravity = true;
-        rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
+        rb.constraints = RigidbodyConstraints.None;
+        rb.AddForce(dir, ForceMode.Impulse);
     }
 
+    public bool IsStable()
+    {
+        return rb.IsSleeping() || isDead;
+    }
 
-    // 初期化処理
-    private　void Start() {
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
+    private bool ShouldBeDisabled()
+    {
+        return transform.position.y < -10;
+    }
+
+    // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
+    private void Kill()
+    {
+        isDead = true;
+        Team = Team.None;
+        gameObject.SetActive(false);
     }
 
     // 削除用プログラムを雑に導入
     private void Update()
     {
-        if(transform.position.y < -10)
+        if(ShouldBeDisabled())
         {
-            Destroy(gameObject);
+            Kill();
         }
     }
 }

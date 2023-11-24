@@ -15,7 +15,7 @@ public class FrontBackCounter : MonoBehaviour
     [SerializeField]
     private GameObject m_PiecesCollector;
 
-    private (int, int) CountFrontBack()
+    public (int, int) CountFrontBack()
     {
         var collectorTransform = m_PiecesCollector.transform;
         var piecesNum = collectorTransform.childCount;
@@ -55,7 +55,6 @@ public class FrontBackCounter : MonoBehaviour
 
     void Update()
     {
-        // バカ
         // フレーム毎に白黒の枚数を数えている
         (int white, int black) countNum = CountFrontBack();
 
