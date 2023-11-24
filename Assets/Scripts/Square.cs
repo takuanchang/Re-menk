@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    static private float ep = 5.0f;
+    private static readonly float VelocityThreshold = 5.0f;
 
     /*
     // Start is called before the first frame update
@@ -24,7 +24,7 @@ public class Square : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<Piece>(out var p))
         {
-            if (collision.relativeVelocity.magnitude > ep)
+            if (collision.relativeVelocity.magnitude > VelocityThreshold)
             {
                 p.GetColliders();
             }
