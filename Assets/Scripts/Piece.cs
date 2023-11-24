@@ -81,13 +81,11 @@ public class Piece : MonoBehaviour
     public void Explode()
     {
         // 近くにあるコライダーを取得
-        Collider[] hitColliders = new Collider[1000];
         const float radius = 2.0f;
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, radius, hitColliders);
-        for (int i = 0; i < numColliders; i++)
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
+        foreach(var collider in hitColliders)
         {
-            // 自分以外の駒の時
-            if(hitColliders[i].TryGetComponent<Piece>(out var p))
+            if(collider.TryGetComponent<Piece>(out var p))
             {
                 if (p == this)
                 {
@@ -96,7 +94,7 @@ public class Piece : MonoBehaviour
                 p.OnExploded(transform.position);
             }
             // マスの時
-            else if (hitColliders[i].TryGetComponent<Square>(out var m))
+            else if (collider.TryGetComponent<Square>(out var m))
             {
 
             }
