@@ -38,12 +38,12 @@ public class TurnManager : MonoBehaviour
 
     public void InitializePlayer()
     {
+        m_playerControllers[0].Team = Team.Black;
+        m_playerControllers[1].Team = Team.White;
+
         // リバーシは黒が先行
         CurrentPlayer = 0;
-        m_playerControllers[CurrentPlayer].Team = Team.Black;
         m_playerControllers[CurrentPlayer].PrepareNextPiece();
-
-        m_playerControllers[(CurrentPlayer + 1) % NUM_PLAYER].Team = Team.White;
     }
 
     void PlayerChange()
