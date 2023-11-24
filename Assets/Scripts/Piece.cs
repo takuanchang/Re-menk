@@ -78,11 +78,11 @@ public class Piece : MonoBehaviour
         }
     }
 
-    private float radius = 2.0f;
-    public void GetColliders()
+    public void Explode()
     {
         // 近くにあるコライダーを取得
         Collider[] hitColliders = new Collider[1000];
+        const float radius = 2.0f;
         int numColliders = Physics.OverlapSphereNonAlloc(transform.position, radius, hitColliders);
         for (int i = 0; i < numColliders; i++)
         {
@@ -93,7 +93,7 @@ public class Piece : MonoBehaviour
                 {
                     continue;
                 }
-                p.Explosion(transform.position);
+                p.OnExploded(transform.position);
             }
             // マスの時
             else if (hitColliders[i].TryGetComponent<Square>(out var m))
@@ -122,7 +122,7 @@ public class Piece : MonoBehaviour
     }
 
     // 吹っ飛ぶ処理
-    public void Explosion(Vector3 pos)
+    public void OnExploded(Vector3 pos)
     {
         Vector3 vec = transform.position - pos;
         float distance = vec.magnitude;

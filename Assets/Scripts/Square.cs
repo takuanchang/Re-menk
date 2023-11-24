@@ -26,7 +26,7 @@ public class Square : MonoBehaviour
         {
             if (collision.relativeVelocity.magnitude > VelocityThreshold)
             {
-                p.GetColliders();
+                p.Explode();
             }
         }
     }
