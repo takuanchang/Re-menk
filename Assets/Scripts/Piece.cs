@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
-    private bool isDead = false;
+    private bool m_isDead = false;
     private Rigidbody rb;
 
     [SerializeField]
@@ -15,7 +15,7 @@ public class Piece : MonoBehaviour
     /// <summary>
     /// 表裏判定の許容誤差
     /// </summary>
-    static readonly float epsilon = 0.2f;
+    static readonly float Epsilon = 0.2f;
 
     /// <summary>
     /// 駒の属するチーム
@@ -52,9 +52,10 @@ public class Piece : MonoBehaviour
         // 駒のRigidbodyを取得して重力を切る
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
 
         // フラグを切る
-        isDead = false;
+        m_isDead = false;
     }
 
     /// <summary>
@@ -62,13 +63,13 @@ public class Piece : MonoBehaviour
     /// </summary>
     public void UpdateTeam()
     {
-        if (isDead)
+        if (m_isDead)
         {
             return;
         }
 
         Vector3 up = transform.up.normalized;
-        if (Mathf.Abs(up.y) < epsilon) {
+        if (Mathf.Abs(up.y) < Epsilon) {
             Team = Team.None; // どちらともいえない
         } else if (up.y > 0.0f) {
             Team = Team.Black; // 表なら黒
@@ -77,24 +78,23 @@ public class Piece : MonoBehaviour
         }
     }
 
-    public void GetColliders()
+    public void Explode()
     {
         // 近くにあるコライダーを取得
-        Collider[] hitColliders = new Collider[1000];
-        int numColliders = Physics.OverlapSphereNonAlloc(transform.position, 4.01f, hitColliders);
-        for (int i = 0; i < numColliders; i++)
+        const float radius = 2.0f;
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
+        foreach(var collider in hitColliders)
         {
-            // 自分以外の駒の時
-            if(hitColliders[i].TryGetComponent<Piece>(out var p))
+            if(collider.TryGetComponent<Piece>(out var p))
             {
                 if (p == this)
                 {
                     continue;
                 }
-                p.Explosion(transform.position);
+                p.OnExploded(transform.position);
             }
             // マスの時
-            else if (hitColliders[i].TryGetComponent<Square>(out var m))
+            else if (collider.TryGetComponent<Square>(out var m))
             {
 
             }
@@ -107,20 +107,20 @@ public class Piece : MonoBehaviour
 
     private Vector3 CalculateForce(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
     private Vector3 CalculateTorque(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / distance;
+        float magnification = m_explosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
     // 吹っ飛ぶ処理
-    public void Explosion(Vector3 pos)
+    public void OnExploded(Vector3 pos)
     {
         Vector3 vec = transform.position - pos;
         float distance = vec.magnitude;
@@ -131,15 +131,16 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
-    public void Shoot()
+    public void Shoot(Vector3 dir)
     {
         rb.useGravity = true;
-        rb.AddForce(new Vector3(0.0f, -10.0f, 0.0f), ForceMode.Impulse);
+        rb.constraints = RigidbodyConstraints.None;
+        rb.AddForce(dir, ForceMode.Impulse);
     }
 
     public bool IsStable()
     {
-        return rb.IsSleeping() || isDead;
+        return rb.IsSleeping() || m_isDead;
     }
 
     private bool ShouldBeDisabled()
@@ -150,7 +151,7 @@ public class Piece : MonoBehaviour
     // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
     private void Kill()
     {
-        isDead = true;
+        m_isDead = true;
         Team = Team.None;
         gameObject.SetActive(false);
     }

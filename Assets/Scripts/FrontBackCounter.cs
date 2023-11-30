@@ -56,9 +56,9 @@ public class FrontBackCounter : MonoBehaviour
     void Update()
     {
         // フレーム毎に白黒の枚数を数えている
-        (int white, int black) countNum = CountFrontBack();
+        var (white, black) = CountFrontBack();
 
-        m_WhiteCounter.text = countNum.white.ToString();
-        m_BlackCounter.text = countNum.black.ToString();
+        m_WhiteCounter.text = white.ToString();
+        m_BlackCounter.text = black.ToString();
     }
 }

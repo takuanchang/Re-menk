@@ -2,69 +2,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Assertions;
 
 public class TurnManager : MonoBehaviour
 {
-    private const int numPlayer = 2;
-    private int currentPlayer;
+    private const int NUM_PLAYER = 2;
+    private int m_currentPlayer = 0;
+
+    private float m_timer = 0.0f;
+    private bool m_isWaiting = false;
+    private static readonly float MinWait = 2.0f;
 
     [SerializeField]
-    private PlayerController[] playerControllers = new PlayerController[numPlayer];
+    private PlayerController[] m_playerControllers = new PlayerController[NUM_PLAYER];
 
     [SerializeField]
     private GameObject m_ResultUI;
+
     [SerializeField]
     private Text m_ResultText;
 
     [SerializeField]
     private FrontBackCounter m_FrontBackCounter;
 
+    public int CurrentPlayer
+    {
+        get => m_currentPlayer;
+
+        private set
+        {
+            Assert.IsTrue(0 <= value && value <= NUM_PLAYER, $"Range error : CurrentPlayer {value}");
+            m_currentPlayer = value;
+        }
+    }
+
     public void InitializePlayer()
     {
+        m_playerControllers[0].Team = Team.Black;
+        m_playerControllers[1].Team = Team.White;
+
         // リバーシは黒が先行
-        currentPlayer = 0;
-        playerControllers[currentPlayer].Team = Team.Black;
-        playerControllers[currentPlayer].PrepareNextPiece();
-
-        playerControllers[(currentPlayer + 1) % numPlayer].Team = Team.White;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        InitializePlayer();
-    }
-
-
-    private float timer = 0.0f;
-    private bool isTimer = false;
-
-    public void OnPieceThrown()
-    {
-        timer = 0.0f;
-        isTimer = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (isTimer)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 2.0f)
-            {
-                PlayerChange();
-                timer = 0.0f;
-                isTimer = false;
-            }
-            return;
-        }
+        CurrentPlayer = 0;
+        m_playerControllers[CurrentPlayer].PrepareNextPiece();
     }
 
     void PlayerChange()
     {
-        currentPlayer = (currentPlayer + 1) % numPlayer; // プレイヤーの入れ替え
-        if (playerControllers[currentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
+        CurrentPlayer = (CurrentPlayer + 1) % NUM_PLAYER; // プレイヤーの入れ替え
+        if (m_playerControllers[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
             return;
         }
@@ -79,15 +64,16 @@ public class TurnManager : MonoBehaviour
     {
         m_ResultUI.SetActive(true);
 
-        (int white, int black) count = m_FrontBackCounter.CountFrontBack();
+        //(int white, int black) count = m_FrontBackCounter.CountFrontBack();
+        var (white, black) = m_FrontBackCounter.CountFrontBack();
 
 
         string result = "";
-        if(count.white < count.black)
+        if(white < black)
         {
             result = "Black Win!";
         }
-        else if(count.black < count.white)
+        else if(black < white)
         {
             result = "White Win!";
         }
@@ -96,5 +82,31 @@ public class TurnManager : MonoBehaviour
             result = "Draw";
         }
         m_ResultText.text = result;
+    }
+
+    public void OnPieceThrown()
+    {
+        m_timer = 0.0f;
+        m_isWaiting = true;
+    }
+
+    void Start()
+    {
+        InitializePlayer();
+    }
+
+    void Update()
+    {
+        if (m_isWaiting)
+        {
+            m_timer += Time.deltaTime;
+            if (m_timer >= MinWait)
+            {
+                PlayerChange();
+                m_timer = 0.0f;
+                m_isWaiting = false;
+            }
+            return;
+        }
     }
 }
