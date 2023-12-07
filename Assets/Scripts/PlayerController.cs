@@ -82,6 +82,10 @@ public class PlayerController : MonoBehaviour
         // 操作可能にする
         IsPlayable = true;
         m_Phase = Phase.SquareSelect;
+
+        // カメラを俯瞰視点にする
+        m_PieceCamera.Priority = 9;
+
         return true;
     }
 
@@ -137,6 +141,8 @@ public class PlayerController : MonoBehaviour
         m_SquareLayerMask = LayerMask.GetMask("Square");
     }
 
+    [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+
     void Update()
     {
         if (!IsPlayable)
@@ -158,6 +164,10 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     m_Phase = Phase.ButtonUpWait;
+
+                    m_PieceCamera.Follow = m_Target.transform;
+                    m_PieceCamera.LookAt = m_Target.transform;
+                    m_PieceCamera.Priority = 11;
                 }
                 break;
             // マウス押し直し待ち
@@ -165,6 +175,7 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
+                    m_PieceCamera.Priority = 9;
                     break;
                 }
                 if (Input.GetMouseButtonDown(0))
