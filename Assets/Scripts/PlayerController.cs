@@ -35,6 +35,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private UnityEvent OnPieceThrown;
 
+    [SerializeField]
+    private Camera m_MainCamera;
+
+    [SerializeField]
+    private Cinemachine.CinemachineFreeLook m_FreeLookCamera;
+
     public enum Phase {
         SquareSelect,
         //MoveCamera,
@@ -85,6 +91,7 @@ public class PlayerController : MonoBehaviour
 
         // カメラを俯瞰視点にする
         m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        m_FreeLookCamera.Priority = 8;
 
         return true;
     }
@@ -154,7 +161,7 @@ public class PlayerController : MonoBehaviour
             // マス選択フェーズ
             case Phase.SquareSelect:
                 // マウスからレイを飛ばす
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
                 {
                     Vector3 pos = hit.collider.transform.position;
@@ -191,6 +198,7 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
+                    m_PieceCamera.Priority = 9;
                     break;
                 }
 
@@ -205,6 +213,8 @@ public class PlayerController : MonoBehaviour
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
+                    m_PieceCamera.Priority = 9;
+                    m_FreeLookCamera.Priority = 11;
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);
                     Throw(dir);
