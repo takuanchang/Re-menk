@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
         m_Phase = Phase.SquareSelect;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = 9;
+        m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
 
         return true;
     }
