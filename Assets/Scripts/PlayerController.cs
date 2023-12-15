@@ -38,8 +38,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Camera m_MainCamera;
 
+    // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
+    // オフライン対戦の場合はDollyCameraを使う
+    // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
     [SerializeField]
     private Cinemachine.CinemachineFreeLook m_FreeLookCamera;
+
+    private Cinemachine.CinemachineVirtualCameraBase m_WaitTimeCamera;
 
     public enum Phase {
         SquareSelect,
