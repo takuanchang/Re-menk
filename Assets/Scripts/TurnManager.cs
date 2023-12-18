@@ -14,7 +14,7 @@ public class TurnManager : MonoBehaviour
     private static readonly float MinWait = 2.0f;
 
     [SerializeField]
-    private PlayerController[] m_playerControllers = new PlayerController[NUM_PLAYER];
+    private IPlayerController[] m_playerControllers = new IPlayerController[NUM_PLAYER];
 
     [SerializeField]
     private GameObject m_ResultUI;
@@ -38,8 +38,8 @@ public class TurnManager : MonoBehaviour
 
     public void InitializePlayer()
     {
-        m_playerControllers[0].Team = Team.Black;
-        m_playerControllers[1].Team = Team.White;
+        m_playerControllers[0].Initialize(Team.Black, this.gameObject);
+        m_playerControllers[1].Initialize(Team.White, this.gameObject);
 
         // リバーシは黒が先行
         CurrentPlayer = 0;

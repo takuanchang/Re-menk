@@ -5,12 +5,16 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 
-public class PlayerController : MonoBehaviour
+// 人間側の実装とする
+
+public class PlayerController : MonoBehaviour , IPlayerController
 {
     /// <summary>
     /// このプレイヤーのチーム
     /// </summary>
-    public Team Team { get; set; } = Team.None;
+    public Team Team { get; private set; } = Team.None;
+
+    private GameObject m_TurnManager = null;
 
     /// <summary>
     /// このプレイヤーが操作可能かどうか
@@ -31,9 +35,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private GameObject m_PiecesCollector;
-
-    [SerializeField]
-    private UnityEvent OnPieceThrown;
 
     [SerializeField]
     private Camera m_MainCamera;
@@ -69,6 +70,12 @@ public class PlayerController : MonoBehaviour
     }
 
     // ------------------------------------------------------------------------------------------
+
+    public void Initialize(Team team, GameObject turnManager)
+    {
+        Team = team;
+        m_TurnManager = turnManager;
+    }
 
     /// <summary>
     /// 次の駒を用意してから操作可能にする
@@ -166,14 +173,22 @@ public class PlayerController : MonoBehaviour
             // マス選択フェーズ
             case Phase.SquareSelect:
                 // マウスからレイを飛ばす
-                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore))
+
+                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
+                if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
                     Vector3 pos = hit.collider.transform.position;
                     pos.y = 3.0f;
                     m_Target.transform.position = pos;
                 }
-                if (Input.GetMouseButtonDown(0))
+
+                //if (IPlayer~~.checkCanMoveTo~~())
+                //{
+
+                //    IPlayer~~.clear
+                //}
+
+                if (Input.GetMouseButtonDown(0)) // 人間依存
                 {
                     m_Phase = Phase.ButtonUpWait;
 
@@ -181,9 +196,11 @@ public class PlayerController : MonoBehaviour
                     m_PieceCamera.LookAt = m_Target.transform;
                     m_PieceCamera.Priority = 11;
                 }
+
                 break;
-            // マウス押し直し待ち
-            case Phase.ButtonUpWait:
+            // 人間：マウス押し直し待ち
+            // CPU : カメラ移動待ち
+            case Phase.ButtonUpWait: // フェーズの名前が人間依存なので変えたほうがgood
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
@@ -207,6 +224,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 }
 
+                // 人間はこんな感じ
                 float dt = Time.deltaTime;
                 sumTime += dt;
                 var mousePos = Input.mousePosition;
@@ -223,8 +241,14 @@ public class PlayerController : MonoBehaviour
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);
                     Throw(dir);
-                    OnPieceThrown.Invoke();
+                    m_TurnManager.SendMessage("OnPieceThrown");
                 }
+
+                // CPU側でもアニメーションを見せるなら数字を決めるだけではだめ
+                // 候補1 : いくつかのアニメーションを用意しておく
+                // 候補2 : その場でいい感じに計算してThrowする
+                // 開始点、折り返し点、終点を計算し、補間する点をMouseHistory(現在名)に入れる
+
                 break;
         }
     }
