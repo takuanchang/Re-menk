@@ -7,7 +7,8 @@ using UnityEngine.Events;
 
 // 人間側の実装とする
 
-public class PlayerController : MonoBehaviour , IPlayerController
+[Serializable]
+public class HumanPlayer : MonoBehaviour , IPlayer
 {
     /// <summary>
     /// このプレイヤーのチーム
@@ -47,12 +48,27 @@ public class PlayerController : MonoBehaviour , IPlayerController
 
     private Cinemachine.CinemachineVirtualCameraBase m_WaitTimeCamera;
 
+    [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+
     public enum Phase {
         SquareSelect,
         //MoveCamera,
         ButtonUpWait,
         PieceThrow
     }
+
+    private Phase m_Phase = Phase.SquareSelect;
+
+    private Vector3 targetPosition = Vector3.zero;
+    private Queue<MouseLog> m_MouseHistory = new();
+    private float sumTime = 0.0f;
+    // 閾値
+    static readonly float threshold = 0.1f;
+
+    float directionParam = 3.0f;
+
+    [SerializeField]
+    private float speedParam = 1.0f;
 
     readonly struct MouseLog {
         public readonly float deltaTime;
@@ -108,20 +124,11 @@ public class PlayerController : MonoBehaviour , IPlayerController
         return true;
     }
 
-    private Phase m_Phase = Phase.SquareSelect;
-
-    public Phase CurrentPhase
+    public string CurrentPhaseString()
     {
-        get => m_Phase;
+        return m_Phase.ToString();
     }
 
-    private Vector3 targetPosition = Vector3.zero;
-    private Queue<MouseLog> m_MouseHistory = new();
-    private float sumTime = 0.0f;
-    // 閾値
-    static readonly float threshold = 0.1f;
-
-    float directionParam = 3.0f;
     private Vector3 CalcurateDirection(Vector3 mousePos) {
         var gap = mousePos - targetPosition;
         gap /= MathF.Min(Screen.width, Screen.height);
@@ -131,8 +138,6 @@ public class PlayerController : MonoBehaviour , IPlayerController
         return gap;
     }
 
-    [SerializeField]
-    private float speedParam = 1.0f;
     private float CalculateSpeed(Queue<MouseLog> history) {
         float speed = 0.0f;
         var length = MathF.Min(Screen.width, Screen.height);
@@ -160,14 +165,13 @@ public class PlayerController : MonoBehaviour , IPlayerController
         m_SquareLayerMask = LayerMask.GetMask("Square");
     }
 
-    [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
-
     void Update()
     {
         if (!IsPlayable)
         {
             return;
         }
+
         switch (m_Phase)
         {
             // マス選択フェーズ

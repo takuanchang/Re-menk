@@ -14,7 +14,8 @@ public class TurnManager : MonoBehaviour
     private static readonly float MinWait = 2.0f;
 
     [SerializeField]
-    private IPlayerController[] m_playerControllers = new IPlayerController[NUM_PLAYER];
+    private GameObject[] m_PlayerObjects = new GameObject[NUM_PLAYER];
+    private IPlayer[] m_Players = new IPlayer[NUM_PLAYER];
 
     [SerializeField]
     private GameObject m_ResultUI;
@@ -38,18 +39,21 @@ public class TurnManager : MonoBehaviour
 
     public void InitializePlayer()
     {
-        m_playerControllers[0].Initialize(Team.Black, this.gameObject);
-        m_playerControllers[1].Initialize(Team.White, this.gameObject);
+        m_Players[0] = m_PlayerObjects[0].GetComponent<IPlayer>();
+        m_Players[1] = m_PlayerObjects[1].GetComponent<IPlayer>();
+
+        m_Players[0].Initialize(Team.Black, this.gameObject);
+        m_Players[1].Initialize(Team.White, this.gameObject);
 
         // リバーシは黒が先行
         CurrentPlayer = 0;
-        m_playerControllers[CurrentPlayer].PrepareNextPiece();
+        m_Players[CurrentPlayer].PrepareNextPiece();
     }
 
     void PlayerChange()
     {
         CurrentPlayer = (CurrentPlayer + 1) % NUM_PLAYER; // プレイヤーの入れ替え
-        if (m_playerControllers[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
+        if (m_Players[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
             return;
         }

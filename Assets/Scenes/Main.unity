@@ -4165,25 +4165,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_OriginalPiece: {fileID: 1517956820960677985, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
   m_PiecesCollector: {fileID: 247150798}
-  OnPieceThrown:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1716532854}
-        m_TargetAssemblyTypeName: TurnManager, Assembly-CSharp
-        m_MethodName: OnPieceThrown
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   m_MainCamera: {fileID: 963194227}
   m_FreeLookCamera: {fileID: 1715968119}
-  speedParam: 2
   m_PieceCamera: {fileID: 659627879}
+  speedParam: 2
 --- !u!4 &624271413
 Transform:
   m_ObjectHideFlags: 0
@@ -4280,7 +4265,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 670900301}
-  - component: {fileID: 670900300}
+  - component: {fileID: 670900303}
+  - component: {fileID: 670900302}
   m_Layer: 0
   m_Name: PlayerController2
   m_TagString: Untagged
@@ -4288,39 +4274,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &670900300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 670900299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9e47af9a33976c4787588b61b9cd100, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_OriginalPiece: {fileID: 1517956820960677985, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
-  m_PiecesCollector: {fileID: 247150798}
-  OnPieceThrown:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1716532854}
-        m_TargetAssemblyTypeName: TurnManager, Assembly-CSharp
-        m_MethodName: OnPieceThrown
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_MainCamera: {fileID: 1744694583}
-  m_FreeLookCamera: {fileID: 605429779}
-  speedParam: 2
-  m_PieceCamera: {fileID: 423493906}
 --- !u!4 &670900301
 Transform:
   m_ObjectHideFlags: 0
@@ -4336,6 +4289,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &670900302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670900299}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4aa125d1a9315e4abe5250da4376ad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OriginalPiece: {fileID: 1517956820960677985, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
+  m_PiecesCollector: {fileID: 247150798}
+  m_MainCamera: {fileID: 1744694583}
+  m_FreeLookCamera: {fileID: 605429779}
+  m_PieceCamera: {fileID: 423493906}
+  speedParam: 2
+--- !u!114 &670900303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670900299}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9e47af9a33976c4787588b61b9cd100, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OriginalPiece: {fileID: 1517956820960677985, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
+  m_PiecesCollector: {fileID: 247150798}
+  m_MainCamera: {fileID: 1744694583}
+  m_FreeLookCamera: {fileID: 605429779}
+  m_PieceCamera: {fileID: 423493906}
+  speedParam: 2
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5005,12 +4994,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea48c8ae851a79644b3a52258506401d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_phaseText: {fileID: 1684294339}
-  m_turnText: {fileID: 105611804}
-  m_turnManager: {fileID: 1716532854}
-  m_playerController:
-  - {fileID: 624271412}
-  - {fileID: 670900300}
+  m_PhaseText: {fileID: 1684294339}
+  m_TurnText: {fileID: 105611804}
+  m_TurnManager: {fileID: 1716532854}
+  m_PlayerObjects:
+  - {fileID: 624271411}
+  - {fileID: 670900299}
 --- !u!1 &815603163
 GameObject:
   m_ObjectHideFlags: 0
@@ -7314,7 +7303,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1195859960}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2762897, y: 0.6099841, z: -0.2397598, w: 0.70292157}
+  m_LocalRotation: {x: 0.2762897, y: 0.60998416, z: -0.23975982, w: 0.7029215}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11165,9 +11154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72f5ee6fb72ccb4489ebd9bea1f2942e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerControllers:
-  - {fileID: 624271412}
-  - {fileID: 670900300}
+  m_PlayerObjects:
+  - {fileID: 624271411}
+  - {fileID: 670900299}
   m_ResultUI: {fileID: 1023254611}
   m_ResultText: {fileID: 984385125}
   m_FrontBackCounter: {fileID: 794680596}

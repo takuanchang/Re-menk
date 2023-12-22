@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPlayerController
+public interface IPlayer
 {
     /// <summary>
     /// このプレイヤーのチーム
@@ -26,4 +26,6 @@ public interface IPlayerController
     /// 次の駒を用意してから操作可能にする
     /// </summary>
     public bool PrepareNextPiece();
+
+    public string CurrentPhaseString();
 }
