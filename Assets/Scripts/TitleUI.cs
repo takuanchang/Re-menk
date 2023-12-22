@@ -13,6 +13,8 @@ public class TitleUI : MonoBehaviour
     private GameObject m_HowToPlayPanel = null;
     [SerializeField]
     private GameObject m_SettingsPanel = null;
+    [SerializeField]
+    private GameObject m_SelectModePanel = null;
 
     static readonly int HowToPageNum = 2;
     private int m_NowHowToPage = 1; // 1-index
@@ -36,6 +38,30 @@ public class TitleUI : MonoBehaviour
         #else
             Application.Quit();
         #endif
+    }
+
+    public void ShowSelectMode()
+    {
+        if (m_RaycastGuard == null || m_SelectModePanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(true);
+        m_SelectModePanel.SetActive(true);
+
+        return;
+    }
+
+    public void HideSelectMode()
+    {
+        if (m_RaycastGuard == null || m_SelectModePanel == null)
+        {
+            return;
+        }
+        m_RaycastGuard.SetActive(false);
+        m_SelectModePanel.SetActive(false);
+
+        return;
     }
 
     public void ShowHowTo()
