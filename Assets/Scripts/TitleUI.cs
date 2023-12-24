@@ -25,6 +25,13 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private Button m_RightArrow;
 
+    private SettingManager setting;
+
+    public void Start()
+    {
+        setting = FindObjectOfType<SettingManager>();
+    }
+
     public void ChangeToGameScene()
     {
         SceneManager.LoadScene("Main");
@@ -189,5 +196,14 @@ public class TitleUI : MonoBehaviour
         m_NowHowToPage--;
         m_HowToPages[m_NowHowToPage + 1].SetActive(false);
         m_HowToPages[m_NowHowToPage].SetActive(true);
+    }
+
+    public void SetGameMode(int settingId)
+    {
+        // settingId : 上位4ビットは人間の数、下位4ビットはCPUの数
+        int cpu = settingId & 0b1111;
+        int human = settingId >> 4;
+
+        setting.SendMessage("SetGameMode", (human, cpu));
     }
 }
