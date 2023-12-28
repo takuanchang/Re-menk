@@ -74,6 +74,13 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_TurnManager = turnManager;
     }
 
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTime, Cinemachine.CinemachineVirtualCamera piece)
+    {
+        m_MainCamera = main;
+        m_WaitTimeCamera = waitTime;
+        m_PieceCamera = piece;
+    }
+
     /// <summary>
     /// 次の駒を用意してから操作可能にする
     /// </summary>

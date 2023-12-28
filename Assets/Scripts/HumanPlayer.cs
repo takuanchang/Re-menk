@@ -44,9 +44,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
     [SerializeField]
-    private Cinemachine.CinemachineFreeLook m_FreeLookCamera;
-
-    private Cinemachine.CinemachineVirtualCameraBase m_WaitTimeCamera;
+    private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
 
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
 
@@ -91,6 +89,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     {
         Team = team;
         m_TurnManager = turnManager;
+    }
+
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
+    {
+        m_MainCamera = main;
+        m_FreeLookCamera = freeLook;
+        m_PieceCamera = piece;
     }
 
     /// <summary>

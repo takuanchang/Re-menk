@@ -16,26 +16,26 @@ public class UiPrinter : MonoBehaviour
         m_Players[0] = m_PlayerObjects[0].GetComponent<IPlayer>();
         m_Players[1] = m_PlayerObjects[1].GetComponent<IPlayer>();
 
-        m_TurnText.text = "Black";
-        m_PhaseText.text = "Black : SquareSelect, White : Not playable";
+        m_TurnText.text = "You";
+        m_PhaseText.text = "You : SquareSelect, Other : Not playable";
     }
 
     // Update is called once per frame
     void Update()
     {
-        m_TurnText.text = m_TurnManager.CurrentPlayer == 0 ? "Black" : "White";
+        m_TurnText.text = m_TurnManager.CurrentPlayer == 0 ? "You" : "Other";
 
-        string blackPhase = "Not playable";
-        string whitePhase = "Not playable";
+        string yourPhase = "Not playable";
+        string othersPhase = "Not playable";
         if (m_Players[0].IsPlayable)
         {
-            blackPhase = m_Players[0].CurrentPhaseString();
+            yourPhase = m_Players[0].CurrentPhaseString();
         }
         if (m_Players[1].IsPlayable)
         {
-            whitePhase = m_Players[1].CurrentPhaseString();
+            othersPhase = m_Players[1].CurrentPhaseString();
         }
 
-        m_PhaseText.text = $"Black : {blackPhase}, White : {whitePhase}";
+        m_PhaseText.text = $"You : {yourPhase}, Other : {othersPhase}";
     }
 }
