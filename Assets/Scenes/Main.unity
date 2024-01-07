@@ -2613,7 +2613,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &423493906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3669,7 +3669,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &605429779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5301,7 +5301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &963018291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8183,6 +8183,8 @@ MonoBehaviour:
   m_PieceCameraPrefab: {fileID: 109360363403942954, guid: a2c84e678aeb6db44a3d28e8760de220, type: 3}
   m_FreeLookCameraPrefab: {fileID: 6424932993811252000, guid: 157a784c3be5d424dbf069a2ca3b80be, type: 3}
   m_DollyCameraPrefab: {fileID: 0}
+  m_TurnManager: {fileID: 1716532853}
+  m_UiPrinter: {fileID: 0}
 --- !u!1 &1452724496
 GameObject:
   m_ObjectHideFlags: 0
@@ -9977,12 +9979,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72f5ee6fb72ccb4489ebd9bea1f2942e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PlayerObjects:
-  - {fileID: 0}
-  - {fileID: 0}
   m_ResultUI: {fileID: 1023254611}
   m_ResultText: {fileID: 984385125}
   m_FrontBackCounter: {fileID: 794680596}
+  m_PlayerGenerator: {fileID: 1438283375}
 --- !u!4 &1716532855
 Transform:
   m_ObjectHideFlags: 0
@@ -12095,6 +12095,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player1 Select Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 5644908779510507693, guid: b17bd78684314fe478669aa9a848ca12, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12151,6 +12155,10 @@ PrefabInstance:
     - target: {fileID: 6424932993811252000, guid: 157a784c3be5d424dbf069a2ca3b80be, type: 3}
       propertyPath: m_Name
       value: Player1 FreeLook Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 6424932993811252000, guid: 157a784c3be5d424dbf069a2ca3b80be, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6903086208113087089, guid: 157a784c3be5d424dbf069a2ca3b80be, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12216,6 +12224,10 @@ PrefabInstance:
     - target: {fileID: 109360363403942954, guid: a2c84e678aeb6db44a3d28e8760de220, type: 3}
       propertyPath: m_Name
       value: Player1 Piece Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 109360363403942954, guid: a2c84e678aeb6db44a3d28e8760de220, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8109501240556553508, guid: a2c84e678aeb6db44a3d28e8760de220, type: 3}
       propertyPath: m_LocalPosition.x

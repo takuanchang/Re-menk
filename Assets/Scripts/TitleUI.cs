@@ -203,7 +203,6 @@ public class TitleUI : MonoBehaviour
         // settingId : 上位4ビットは人間の数、下位4ビットはCPUの数
         int cpu = settingId & 0b1111;
         int human = settingId >> 4;
-
         setting.SendMessage("SetGameMode", (human, cpu));
     }
 }

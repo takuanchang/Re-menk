@@ -34,8 +34,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
     private Piece m_Target;
 
-    [SerializeField]
-    private GameObject m_PiecesCollector;
+    private Transform m_PiecesCollector;
 
     [SerializeField]
     private Camera m_MainCamera;
@@ -68,10 +67,11 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         return Vector3.zero; // とりあえずズレなし
     }
 
-    public void Initialize(Team team, GameObject turnManager)
+    public void Initialize(Team team, GameObject turnManager, Transform piecesCollector)
     {
         Team = team;
         m_TurnManager = turnManager;
+        m_PiecesCollector = piecesCollector;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTime, Cinemachine.CinemachineVirtualCamera piece)

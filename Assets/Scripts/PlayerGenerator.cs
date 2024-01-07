@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 public class PlayerGenerator : MonoBehaviour
 {
@@ -15,17 +16,17 @@ public class PlayerGenerator : MonoBehaviour
     [SerializeField] private GameObject m_FreeLookCameraPrefab;
     [SerializeField] private GameObject m_DollyCameraPrefab;
 
-    [SerializeField] private TurnManager m_TurnManager;
+    [SerializeField] private GameObject m_TurnManager;
     [SerializeField] private UiPrinter m_UiPrinter;
 
-    void Start()
+    public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum)
     {
-        setting = FindObjectOfType<SettingManager>();
-        int humanNum = setting.HumanNum;
-        int cpuNum = setting.ComputerNum;
 
-        GameObject piecesCollector = GameObject.Find("PiecesCollerctor");
+        Transform piecesCollector = GameObject.Find("PiecesCollector").transform;
         Transform board = GameObject.Find("Board").transform;
+
+        var playersNum = humanNum + cpuNum;
+        List<IPlayer> players = new List<IPlayer>();
 
         int freeLookPriority = 8; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
                                   // 誰から開始か、どのタイミングで決める？
@@ -35,57 +36,63 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
+            humanPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // 3人以上の時Team等要修正
+            players.Add(humanPlayer);
 
-            Camera mainCamera =  Instantiate(m_MainCameraPrefab);
+            Camera mainCamera = Instantiate(m_MainCameraPrefab);
             mainCamera.cullingMask |= (1 << (myLayer));
+            mainCamera.rect = new Rect(0.5f * (i % 2), 0.5f * (i / 2), 0.5f, (playersNum >= 3 ? 0.5f : 1.0f));
+
+            GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
+            selectCamera.layer = myLayer;
 
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
             Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             freeLookBase.Priority = freeLookPriority;
+            freeLookBase.Follow = board;
+            freeLookBase.LookAt = board;
 
             GameObject pieceCamera = Instantiate(m_PieceCameraPrefab);
-            freeLook.layer = myLayer;
+            pieceCamera.layer = myLayer;
             Cinemachine.CinemachineVirtualCamera pieceCameraBase = pieceCamera.GetComponent<Cinemachine.CinemachineVirtualCamera>();
             Assert.IsNotNull(pieceCameraBase);
-            pieceCameraBase.Follow = board;
-            pieceCameraBase.LookAt = board;
 
             humanPlayer.SetupCameras(mainCamera, freeLookBase, pieceCameraBase);
 
             freeLookPriority = 11;
         }
 
-        for (int i = humanNum; i < cpuNum + humanNum; i++)
+        for (int i = humanNum; i < playersNum; i++)
         {
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
+            computerPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // 3人以上の時Team等要修正
+            players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
             mainCamera.cullingMask |= (1 << myLayer);
+            mainCamera.rect = new Rect(0.5f * (i % 2), 0.5f * (i / 2), 0.5f, (playersNum >= 3 ? 0.5f : 1.0f));
+
+            GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
+            selectCamera.layer = myLayer;
 
             // これ本当はDolbyのカメラにした方がいい
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
             Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             freeLookBase.Priority = freeLookPriority;
+            freeLookBase.Follow = board;
+            freeLookBase.LookAt = board;
 
             GameObject pieceCamera = Instantiate(m_PieceCameraPrefab);
             pieceCamera.layer = myLayer;
             Cinemachine.CinemachineVirtualCamera pieceCameraBase = pieceCamera.GetComponent<Cinemachine.CinemachineVirtualCamera>();
-            pieceCameraBase.Follow = board;
-            pieceCameraBase.LookAt = board;
 
             computerPlayer.SetupCameras(mainCamera, freeLookBase, pieceCameraBase);
         }
-
-        m_TurnManager.SendMessage("");
+        return players;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }
