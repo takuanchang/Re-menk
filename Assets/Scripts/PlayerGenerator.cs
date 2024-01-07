@@ -36,7 +36,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // 3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -45,6 +45,7 @@ public class PlayerGenerator : MonoBehaviour
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
+            selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
 
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
@@ -77,6 +78,7 @@ public class PlayerGenerator : MonoBehaviour
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
+            selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
 
             // これ本当はDolbyのカメラにした方がいい
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
