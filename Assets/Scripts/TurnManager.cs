@@ -15,6 +15,9 @@ public class TurnManager : MonoBehaviour
     private List<IPlayer> m_Players;
 
     [SerializeField]
+    private UiPrinter uiPrinter;
+
+    [SerializeField]
     private GameObject m_ResultUI;
 
     [SerializeField]
@@ -92,6 +95,8 @@ public class TurnManager : MonoBehaviour
         // リバーシは黒が先行
         CurrentPlayer = 0;
         m_Players[CurrentPlayer].PrepareNextPiece();
+
+        // 仕方ないがUIプリンターにプレイヤー情報を入れる
     }
 
     void Update()

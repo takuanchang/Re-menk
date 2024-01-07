@@ -43,7 +43,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
     [SerializeField]
-    private Cinemachine.CinemachineFreeLook m_FreeLookCamera;
+    private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
 
     private Cinemachine.CinemachineVirtualCameraBase m_WaitTimeCamera;
 
@@ -74,10 +74,11 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_PiecesCollector = piecesCollector;
     }
 
-    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTime, Cinemachine.CinemachineVirtualCamera piece)
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
     {
         m_MainCamera = main;
-        m_WaitTimeCamera = waitTime;
+        //m_WaitTimeCamera = waitTimeCamera;
+        m_FreeLookCamera = waitTimeCamera;
         m_PieceCamera = piece;
     }
 

@@ -8,21 +8,27 @@ public class UiPrinter : MonoBehaviour
     [SerializeField] private Text m_PhaseText;
     [SerializeField] private Text m_TurnText;
     [SerializeField] private TurnManager m_TurnManager;
-    [SerializeField] private GameObject[] m_PlayerObjects = new GameObject[2];
-    private IPlayer[] m_Players = new IPlayer[2]; // とりあえず数字そのまま放り込む
+    private List<IPlayer> m_Players = null;
 
     void Start()
     {
-        m_Players[0] = m_PlayerObjects[0].GetComponent<IPlayer>();
-        m_Players[1] = m_PlayerObjects[1].GetComponent<IPlayer>();
-
         m_TurnText.text = "You";
         m_PhaseText.text = "You : SquareSelect, Other : Not playable";
+    }
+
+    public void Initialize(List<IPlayer> Players)
+    {
+        m_Players = Players;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (m_Players == null)
+        {
+            return;
+        }
+
         m_TurnText.text = m_TurnManager.CurrentPlayer == 0 ? "You" : "Other";
 
         string yourPhase = "Not playable";

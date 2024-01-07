@@ -4540,9 +4540,6 @@ MonoBehaviour:
   m_PhaseText: {fileID: 1684294339}
   m_TurnText: {fileID: 105611804}
   m_TurnManager: {fileID: 1716532854}
-  m_PlayerObjects:
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &815603163
 GameObject:
   m_ObjectHideFlags: 0
@@ -9979,6 +9976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72f5ee6fb72ccb4489ebd9bea1f2942e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiPrinter: {fileID: 794680597}
   m_ResultUI: {fileID: 1023254611}
   m_ResultText: {fileID: 984385125}
   m_FrontBackCounter: {fileID: 794680596}
