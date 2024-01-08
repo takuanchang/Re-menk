@@ -10,12 +10,6 @@ public class UiPrinter : MonoBehaviour
     [SerializeField] private TurnManager m_TurnManager;
     private List<IPlayer> m_Players = null;
 
-    void Start()
-    {
-        m_TurnText.text = "You";
-        m_PhaseText.text = "You : SquareSelect, Other : Not playable";
-    }
-
     public void Initialize(List<IPlayer> Players)
     {
         m_Players = Players;
@@ -29,19 +23,13 @@ public class UiPrinter : MonoBehaviour
             return;
         }
 
-        m_TurnText.text = m_TurnManager.CurrentPlayer == 0 ? "You" : "Other";
-
-        string yourPhase = "Not playable";
-        string othersPhase = "Not playable";
-        if (m_Players[0].IsPlayable)
+        m_TurnText.text = $"Player{m_TurnManager.CurrentPlayer + 1}";
+        m_PhaseText.text = "";
+        for (int i = 0; i < m_Players.Count; i++)
         {
-            yourPhase = m_Players[0].CurrentPhaseString();
+            string phase = (m_Players[i].IsPlayable ? m_Players[i].CurrentPhaseString() : "Not Playable");
+            m_PhaseText.text += $"Player{i + 1} : {phase}";
+            if (i != m_Players.Count - 1) m_PhaseText.text += '\n';
         }
-        if (m_Players[1].IsPlayable)
-        {
-            othersPhase = m_Players[1].CurrentPhaseString();
-        }
-
-        m_PhaseText.text = $"You : {yourPhase}, Other : {othersPhase}";
     }
 }

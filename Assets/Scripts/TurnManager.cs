@@ -97,6 +97,8 @@ public class TurnManager : MonoBehaviour
         m_Players[CurrentPlayer].PrepareNextPiece();
 
         // 仕方ないがUIプリンターにプレイヤー情報を入れる
+        // TODO 実装時は表示しない(消す)
+        uiPrinter.Initialize(m_Players);
     }
 
     void Update()

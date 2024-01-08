@@ -77,8 +77,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
     {
         m_MainCamera = main;
-        //m_WaitTimeCamera = waitTimeCamera;
-        m_FreeLookCamera = waitTimeCamera;
+        m_WaitTimeCamera = waitTimeCamera;
+        //m_FreeLookCamera = waitTimeCamera;
         m_PieceCamera = piece;
     }
 
@@ -107,7 +107,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         // カメラを俯瞰視点にする
         m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_FreeLookCamera.Priority = 8;
+        m_WaitTimeCamera.Priority = 8;
 
         _ = ExecuteTurn();
 
@@ -143,7 +143,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         await UniTask.Delay(TimeSpan.FromSeconds(1.0f)); // すぐ投げられるとびっくりするので待つ
 
         m_PieceCamera.Priority = 9;
-        m_FreeLookCamera.Priority = 11;
+        m_WaitTimeCamera.Priority = 11;
 
         var dir = CalcurateDirection();
         dir.y = CalculateSpeed();
@@ -171,8 +171,4 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     }
 
     // ------------------------------------------------------------------------------------------
-    public void Start()
-    {
-        
-    }
 }

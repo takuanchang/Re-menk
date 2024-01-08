@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,7 +37,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesCollector); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -64,12 +65,13 @@ public class PlayerGenerator : MonoBehaviour
             freeLookPriority = 11;
         }
 
+        CinemachineSmoothPath cinemachineSmoothPath = GameObject.Find("DollyTrack").GetComponent<CinemachineSmoothPath>();
         for (int i = humanNum; i < playersNum; i++)
         {
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)i, m_TurnManager, piecesCollector); // 3人以上の時Team等要修正
+            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesCollector); // 3人以上の時Team等要修正
             players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -80,19 +82,19 @@ public class PlayerGenerator : MonoBehaviour
             selectCamera.layer = myLayer;
             selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
 
-            // これ本当はDolbyのカメラにした方がいい
-            GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
-            freeLook.layer = myLayer;
-            Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
-            freeLookBase.Priority = freeLookPriority;
-            freeLookBase.Follow = board;
-            freeLookBase.LookAt = board;
+            GameObject DollyCamera = Instantiate(m_DollyCameraPrefab);
+            DollyCamera.layer = myLayer;
+            DollyCamera.GetComponent<CinemachineDollyCart>().m_Path = cinemachineSmoothPath;
+            Cinemachine.CinemachineVirtualCameraBase DollyCameraBase = DollyCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
+            DollyCameraBase.Priority = freeLookPriority;
+            DollyCameraBase.Follow = board;
+            DollyCameraBase.LookAt = board;
 
             GameObject pieceCamera = Instantiate(m_PieceCameraPrefab);
             pieceCamera.layer = myLayer;
             Cinemachine.CinemachineVirtualCamera pieceCameraBase = pieceCamera.GetComponent<Cinemachine.CinemachineVirtualCamera>();
 
-            computerPlayer.SetupCameras(mainCamera, freeLookBase, pieceCameraBase);
+            computerPlayer.SetupCameras(mainCamera, DollyCameraBase, pieceCameraBase);
         }
         return players;
     }
