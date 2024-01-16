@@ -1750,8 +1750,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 247150799}
+  - component: {fileID: 247150800}
   m_Layer: 0
-  m_Name: PiecesCollector
+  m_Name: PiecesManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1772,6 +1773,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &247150800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 247150798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37420971615367845a72c7e67d2989d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OriginalPiece: {fileID: 1517956820960677985, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
 --- !u!1 &286807094
 GameObject:
   m_ObjectHideFlags: 3
