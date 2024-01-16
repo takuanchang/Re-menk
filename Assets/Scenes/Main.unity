@@ -10120,6 +10120,7 @@ MonoBehaviour:
   m_ResultText: {fileID: 984385125}
   m_FrontBackCounter: {fileID: 794680596}
   m_PlayerGenerator: {fileID: 1438283375}
+  m_PiecesManager: {fileID: 247150800}
 --- !u!4 &1716532855
 Transform:
   m_ObjectHideFlags: 0

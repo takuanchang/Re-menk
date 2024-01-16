@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
+using Cysharp.Threading.Tasks;
+using static HumanPlayer;
+using System;
 
 public class TurnManager : MonoBehaviour
 {
     private int m_currentPlayer = 0;
 
-    private float m_timer = 0.0f;
-    private bool m_isWaiting = false;
-    private static readonly float MinWait = 2.0f;
+    // 現状このフラグを使う必要がなくなっている
+    // private bool m_isWaiting = false;
+    private static readonly float MaxWait = 8.0f;
+    private static readonly float Span = 1.0f;
 
     private List<IPlayer> m_Players;
 
@@ -28,6 +32,9 @@ public class TurnManager : MonoBehaviour
 
     [SerializeField]
     private PlayerGenerator m_PlayerGenerator;
+
+    [SerializeField]
+    private PiecesManager m_PiecesManager;
 
     public int CurrentPlayer
     {
@@ -80,8 +87,8 @@ public class TurnManager : MonoBehaviour
 
     public void OnPieceThrown()
     {
-        m_timer = 0.0f;
-        m_isWaiting = true;
+        // m_isWaiting = true;
+        _ = EndTurn();
     }
 
     void Start()
@@ -101,18 +108,16 @@ public class TurnManager : MonoBehaviour
         uiPrinter.Initialize(m_Players);
     }
 
-    void Update()
+    private async UniTaskVoid EndTurn()
     {
-        if (m_isWaiting)
+        float time = 0.0f;
+        // 全ピースが止まるか待機時間がMaxWaitを超えると抜け出す
+        while (!m_PiecesManager.IsStableAll() && time < MaxWait)
         {
-            m_timer += Time.deltaTime;
-            if (m_timer >= MinWait)
-            {
-                PlayerChange();
-                m_timer = 0.0f;
-                m_isWaiting = false;
-            }
-            return;
+            await UniTask.Delay(TimeSpan.FromSeconds(Span));
+            time += Span;
         }
+        PlayerChange();
+        // m_isWaiting = false;
     }
 }
