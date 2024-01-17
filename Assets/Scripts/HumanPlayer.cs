@@ -191,12 +191,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                     m_Target.transform.position = pos;
                 }
 
-                //if (IPlayer~~.checkCanMoveTo~~())
-                //{
-
-                //    IPlayer~~.clear
-                //}
-
                 if (Input.GetMouseButtonDown(0)) // 人間依存
                 {
                     m_Phase = Phase.ButtonUpWait;
