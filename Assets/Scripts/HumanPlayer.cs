@@ -131,10 +131,14 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     private Vector3 CalcurateDirection(Vector3 mousePos) {
         var gap = mousePos - targetPosition;
+        // 座標変換でカメラの方向とズレの方向を調整
+        gap = RotateThrowingVector(gap);
+
         gap /= MathF.Min(Screen.width, Screen.height);
         gap *= directionParam;
         gap.z = gap.y;
         gap.y = 0.0f;
+        Debug.Log(gap);
         return gap;
     }
 
@@ -163,6 +167,16 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     void Start() {
         m_SquareLayerMask = LayerMask.GetMask("Square");
+    }
+
+    // チーム(自身のカメラ)に合わせて向きを調整
+    public Vector3 RotateThrowingVector(Vector3 mouseDifference)
+    {
+        float rot = m_MainCamera.transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
+        float x = MathF.Cos(rot) * mouseDifference.x + MathF.Sin(rot) * mouseDifference.y;
+        float y = -MathF.Sin(rot) * mouseDifference.x + MathF.Cos(rot) * mouseDifference.y;
+        float z = mouseDifference.z;
+        return new Vector3(x, y, z);
     }
 
     void Update()
