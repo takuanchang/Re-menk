@@ -20,6 +20,16 @@ public class Square : MonoBehaviour
     }
     */
 
+    // TODO:要調整
+    public void TurnOn()
+    {
+        GetComponent<Renderer>().material.color = Color.yellow;
+    }
+    public void TurnOff()
+    {
+        GetComponent<Renderer>().material.color = Color.white;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.TryGetComponent<Piece>(out var p))

@@ -26,47 +26,42 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// このプレイヤーに残っている駒の数
     /// 但し操作中の駒はカウントされない
     /// </summary>
-    public int RemainingPieces { get; private set; } = 8;
+    public int RemainingPieces { get; private set; } = 4; // TODO:実際は32等に
 
     private int m_SquareLayerMask;
 
     private Piece m_Target;
+    // 選択中のマスのコライダー
+    private Collider m_SquareCollider = null;
 
     private PiecesManager m_PiecesManager;
 
-    [SerializeField]
-    private Camera m_MainCamera;
-
+    [SerializeField] private Camera m_MainCamera;
     // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
-    [SerializeField]
-    private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
-
+    [SerializeField] private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+    [SerializeField] private float rayLength = 20.0f;
 
-    [SerializeField]
-    private float rayLength = 20.0f;
-
+    // フェーズ
     public enum Phase {
         SquareSelect,
         //MoveCamera,
         ButtonUpWait,
         PieceThrow
     }
-
     private Phase m_Phase = Phase.SquareSelect;
 
     private Vector3 targetPosition = Vector3.zero;
     private Queue<MouseLog> m_MouseHistory = new();
     private float sumTime = 0.0f;
-    // 閾値
+    // 速さ決定時の履歴保存秒数の閾値
     static readonly float threshold = 0.1f;
 
-    float directionParam = 3.0f;
-
-    [SerializeField]
-    private float speedParam = 1.0f;
+    // パラメータ群
+    [SerializeField] private float directionParam = 3.0f;
+    [SerializeField] private float speedParam = 1.0f;
 
     readonly struct MouseLog {
         public readonly float deltaTime;
@@ -195,9 +190,24 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
                 if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
-                    Vector3 pos = hit.collider.transform.position;
-                    pos.y = 3.0f;
-                    m_Target.transform.position = pos;
+                    var col = hit.collider;
+                    if(col!= m_SquareCollider)
+                    {
+                        // 非選択マスを光らせなくする
+                        if (m_SquareCollider != null)
+                        {
+                            m_SquareCollider.GetComponent<Square>().TurnOff();
+                        }
+                        // 選択マスを光らせる
+                        col.GetComponent<Square>().TurnOn();
+
+                        // 駒の位置変更
+                        Vector3 pos = col.transform.position;
+                        pos.y = 3.0f;
+                        m_Target.transform.position = pos;
+
+                        m_SquareCollider = col;
+                    }
                 }
 
                 //if (IPlayer~~.checkCanMoveTo~~())
@@ -206,8 +216,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 //    IPlayer~~.clear
                 //}
 
-                if (Input.GetMouseButtonDown(0)) // 人間依存
+                if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
                 {
+                    m_SquareCollider.GetComponent<Square>().TurnOff();
+                    m_SquareCollider = null;
+
                     m_Phase = Phase.ButtonUpWait;
 
                     m_PieceCamera.Follow = m_Target.transform;
