@@ -45,6 +45,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
 
+    [SerializeField]
+    private float rayLength = 20.0f;
+
     public enum Phase {
         SquareSelect,
         //MoveCamera,
@@ -137,7 +140,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         gap /= MathF.Min(Screen.width, Screen.height);
         gap *= directionParam;
-        Debug.Log(gap);
+        // Debug.Log(gap);
         return gap;
     }
 
@@ -171,19 +174,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     // チーム(自身のカメラ)に合わせて向きを調整
     public Vector3 RotateThrowingVector(Vector3 mouseDifference)
     {
-        float rot = m_MainCamera.transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
-        float x = MathF.Cos(rot) * mouseDifference.x + MathF.Sin(rot) * mouseDifference.y;
-        float y = -MathF.Sin(rot) * mouseDifference.x + MathF.Cos(rot) * mouseDifference.y;
-        float z = mouseDifference.z;
-        return new Vector3(x, y, z);
-    }
-
-    public Vector3 RotateThrowingVector2(Vector3 mouseDifference)
-    {
         var roty = m_MainCamera.transform.rotation.eulerAngles.y;
         var quat = Quaternion.AngleAxis(roty, Vector3.up);
-        var a = quat * mouseDifference;
-        return a;
+        return quat * mouseDifference;
     }
 
     void Update()
@@ -200,7 +193,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 // マウスからレイを飛ばす
 
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
-                if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
+                if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
                     Vector3 pos = hit.collider.transform.position;
                     pos.y = 3.0f;
