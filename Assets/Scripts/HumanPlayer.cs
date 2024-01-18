@@ -26,15 +26,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// このプレイヤーに残っている駒の数
     /// 但し操作中の駒はカウントされない
     /// </summary>
-    public int RemainingPieces { get; private set; } = 32;
+    public int RemainingPieces { get; private set; } = 8;
 
     private int m_SquareLayerMask;
 
-    [SerializeField]
-    private Piece m_OriginalPiece;
     private Piece m_Target;
 
-    private Transform m_PiecesCollector;
+    private PiecesManager m_PiecesManager;
 
     [SerializeField]
     private Camera m_MainCamera;
@@ -84,11 +82,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     // ------------------------------------------------------------------------------------------
 
-    public void Initialize(Team team, GameObject turnManager, Transform piecesCollector)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager)
     {
         Team = team;
         m_TurnManager = turnManager;
-        m_PiecesCollector = piecesCollector;
+        m_PiecesManager = piecesManager;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
@@ -112,10 +110,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         }
 
         // 駒を用意する
-        var position = new Vector3(3.5f, 5.0f, 3.5f);
-        m_Target = Instantiate(m_OriginalPiece, position, Quaternion.identity, m_PiecesCollector.transform);
-        m_Target.Initialize(Team);
-
+        m_Target = m_PiecesManager.CreatePiece(Team);
         RemainingPieces--;
 
         // 操作可能にする
@@ -136,10 +131,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     private Vector3 CalcurateDirection(Vector3 mousePos) {
         var gap = mousePos - targetPosition;
+        (gap.y, gap.z) = (0.0f, gap.y);
+        // 座標変換でカメラの方向とズレの方向を調整
+        gap = RotateThrowingVector(gap);
+
         gap /= MathF.Min(Screen.width, Screen.height);
         gap *= directionParam;
-        gap.z = gap.y;
-        gap.y = 0.0f;
+        Debug.Log(gap);
         return gap;
     }
 
@@ -168,6 +166,24 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     void Start() {
         m_SquareLayerMask = LayerMask.GetMask("Square");
+    }
+
+    // チーム(自身のカメラ)に合わせて向きを調整
+    public Vector3 RotateThrowingVector(Vector3 mouseDifference)
+    {
+        float rot = m_MainCamera.transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
+        float x = MathF.Cos(rot) * mouseDifference.x + MathF.Sin(rot) * mouseDifference.y;
+        float y = -MathF.Sin(rot) * mouseDifference.x + MathF.Cos(rot) * mouseDifference.y;
+        float z = mouseDifference.z;
+        return new Vector3(x, y, z);
+    }
+
+    public Vector3 RotateThrowingVector2(Vector3 mouseDifference)
+    {
+        var roty = m_MainCamera.transform.rotation.eulerAngles.y;
+        var quat = Quaternion.AngleAxis(roty, Vector3.up);
+        var a = quat * mouseDifference;
+        return a;
     }
 
     void Update()
