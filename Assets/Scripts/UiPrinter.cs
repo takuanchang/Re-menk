@@ -5,33 +5,31 @@ using UnityEngine.UI;
 
 public class UiPrinter : MonoBehaviour
 {
-    [SerializeField] private Text m_phaseText;
-    [SerializeField] private Text m_turnText;
-    [SerializeField] private TurnManager m_turnManager;
-    [SerializeField] private PlayerController[] m_playerController = new PlayerController[2]; // とりあえず数字そのまま放り込む
+    [SerializeField] private Text m_PhaseText;
+    [SerializeField] private Text m_TurnText;
+    [SerializeField] private TurnManager m_TurnManager;
+    private List<IPlayer> m_Players = null;
 
-    void Start()
+    public void Initialize(List<IPlayer> Players)
     {
-        m_turnText.text = "Black";
-        m_phaseText.text = "Black : SquareSelect, White : Not playable";
+        m_Players = Players;
     }
 
     // Update is called once per frame
     void Update()
     {
-        m_turnText.text = m_turnManager.CurrentPlayer == 0 ? "Black" : "White";
-
-        string blackPhase = "Not playable";
-        string whitePhase = "Not playable";
-        if (m_playerController[0].IsPlayable)
+        if (m_Players == null)
         {
-            blackPhase = m_playerController[0].CurrentPhase.ToString();
-        }
-        if (m_playerController[1].IsPlayable)
-        {
-            whitePhase = m_playerController[1].CurrentPhase.ToString();
+            return;
         }
 
-        m_phaseText.text = $"Black : {blackPhase}, White : {whitePhase}";
+        m_TurnText.text = $"Player{m_TurnManager.CurrentPlayer + 1}";
+        m_PhaseText.text = "";
+        for (int i = 0; i < m_Players.Count; i++)
+        {
+            string phase = (m_Players[i].IsPlayable ? m_Players[i].CurrentPhaseString() : "Not Playable");
+            m_PhaseText.text += $"Player{i + 1} : {phase}";
+            if (i != m_Players.Count - 1) m_PhaseText.text += '\n';
+        }
     }
 }

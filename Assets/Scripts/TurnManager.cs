@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
+using Cysharp.Threading.Tasks;
+using static HumanPlayer;
+using System;
 
 public class TurnManager : MonoBehaviour
 {
-    private const int NUM_PLAYER = 2;
     private int m_currentPlayer = 0;
 
-    private float m_timer = 0.0f;
-    private bool m_isWaiting = false;
-    private static readonly float MinWait = 2.0f;
+    // 現状このフラグを使う必要がなくなっている
+    // private bool m_isWaiting = false;
+    private static readonly float MaxWait = 8.0f;
+    private static readonly float Span = 1.0f;
+
+    private List<IPlayer> m_Players;
 
     [SerializeField]
-    private PlayerController[] m_playerControllers = new PlayerController[NUM_PLAYER];
+    private UiPrinter uiPrinter;
 
     [SerializeField]
     private GameObject m_ResultUI;
@@ -25,31 +30,27 @@ public class TurnManager : MonoBehaviour
     [SerializeField]
     private FrontBackCounter m_FrontBackCounter;
 
+    [SerializeField]
+    private PlayerGenerator m_PlayerGenerator;
+
+    [SerializeField]
+    private PiecesManager m_PiecesManager;
+
     public int CurrentPlayer
     {
         get => m_currentPlayer;
 
         private set
         {
-            Assert.IsTrue(0 <= value && value <= NUM_PLAYER, $"Range error : CurrentPlayer {value}");
+            Assert.IsTrue(0 <= value && value <= m_Players.Count, $"Range error : CurrentPlayer {value}");
             m_currentPlayer = value;
         }
     }
 
-    public void InitializePlayer()
-    {
-        m_playerControllers[0].Team = Team.Black;
-        m_playerControllers[1].Team = Team.White;
-
-        // リバーシは黒が先行
-        CurrentPlayer = 0;
-        m_playerControllers[CurrentPlayer].PrepareNextPiece();
-    }
-
     void PlayerChange()
     {
-        CurrentPlayer = (CurrentPlayer + 1) % NUM_PLAYER; // プレイヤーの入れ替え
-        if (m_playerControllers[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
+        CurrentPlayer = (CurrentPlayer + 1) % m_Players.Count; // プレイヤーの入れ替え
+        if (m_Players[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
             return;
         }
@@ -86,27 +87,37 @@ public class TurnManager : MonoBehaviour
 
     public void OnPieceThrown()
     {
-        m_timer = 0.0f;
-        m_isWaiting = true;
+        // m_isWaiting = true;
+        _ = EndTurn();
     }
 
     void Start()
     {
-        InitializePlayer();
+        var setting = FindObjectOfType<SettingManager>();
+        int humanNum = setting.HumanNum;
+        int cpuNum = setting.ComputerNum;
+
+        m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
+
+        // リバーシは黒が先行
+        CurrentPlayer = 0;
+        m_Players[CurrentPlayer].PrepareNextPiece();
+
+        // 仕方ないがUIプリンターにプレイヤー情報を入れる
+        // TODO 実装時は表示しない(消す)
+        uiPrinter.Initialize(m_Players);
     }
 
-    void Update()
+    private async UniTaskVoid EndTurn()
     {
-        if (m_isWaiting)
+        float time = 0.0f;
+        // 全ピースが止まるか待機時間がMaxWaitを超えると抜け出す
+        while (!m_PiecesManager.IsStableAll() && time < MaxWait)
         {
-            m_timer += Time.deltaTime;
-            if (m_timer >= MinWait)
-            {
-                PlayerChange();
-                m_timer = 0.0f;
-                m_isWaiting = false;
-            }
-            return;
+            await UniTask.Delay(TimeSpan.FromSeconds(Span));
+            time += Span;
         }
+        PlayerChange();
+        // m_isWaiting = false;
     }
 }
