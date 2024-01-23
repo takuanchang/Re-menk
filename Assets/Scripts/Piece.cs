@@ -8,6 +8,7 @@ public class Piece : MonoBehaviour
 {
     private bool m_isDead = false;
     private Rigidbody rb;
+    // private GameObject m_Particle;
 
     [SerializeField]
     private float m_explosionParam = 2.0f;
@@ -21,6 +22,9 @@ public class Piece : MonoBehaviour
     /// 駒の属するチーム
     /// </summary>
     public Team Team { get; private set; } = Team.None;
+
+    [SerializeField]
+    private GameObject m_Particle;
 
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
@@ -53,6 +57,13 @@ public class Piece : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeAll;
+
+        // Shoot時に表示するエフェクトを非表示にする
+        m_Particle.SetActive(false);
+        if (initialTeam == Team.White)
+        {
+            m_Particle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 180.0f);
+        }
 
         // フラグを切る
         m_isDead = false;
@@ -133,6 +144,8 @@ public class Piece : MonoBehaviour
 
     public void Shoot(Vector3 dir)
     {
+        m_Particle.SetActive(true);
+
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.None;
         rb.AddForce(dir, ForceMode.Impulse);
