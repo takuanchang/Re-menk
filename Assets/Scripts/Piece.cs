@@ -22,6 +22,10 @@ public class Piece : MonoBehaviour
     /// </summary>
     public Team Team { get; private set; } = Team.None;
 
+    // 爆発出来る速さの最小値
+    private static readonly float ExplodableSpeedMin = 5.0f;
+
+
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
     /// </summary>
@@ -78,7 +82,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    public void Explode()
+    public void Explode(float speedOnCollision)
     {
         // 近くにあるコライダーを取得
         const float radius = 2.0f;
@@ -96,7 +100,7 @@ public class Piece : MonoBehaviour
             // マスの時
             else if (collider.TryGetComponent<Square>(out var m))
             {
-
+                // マスのダメージ計算等を用意する
             }
             else
             {
@@ -131,6 +135,7 @@ public class Piece : MonoBehaviour
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 
+
     public void Shoot(Vector3 dir)
     {
         rb.useGravity = true;
@@ -162,6 +167,22 @@ public class Piece : MonoBehaviour
         if(ShouldBeDisabled())
         {
             Kill();
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent<Piece>(out var p))
+        {
+            // TODO:当たったのが駒の時、何か考えてもいいかも
+        }
+        if (collision.gameObject.TryGetComponent<Square>(out _))
+        {
+            var relativeSpeed = collision.relativeVelocity.magnitude;
+            if (relativeSpeed > ExplodableSpeedMin)
+            {
+                this.Explode(relativeSpeed);
+            }
         }
     }
 }

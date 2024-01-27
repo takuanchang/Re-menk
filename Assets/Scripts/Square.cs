@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    private static readonly float VelocityThreshold = 5.0f;
-
     private Material m_material;
 
     private float m_HitPoint;
@@ -43,15 +41,15 @@ public class Square : MonoBehaviour
         m_material.SetColor("_EmissionColor", Color.black);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    // マスがダメージを貰う処理
+    public void OnExploded(Vector3 direction, float speed)
     {
-        if (collision.gameObject.TryGetComponent<Piece>(out var p))
-        {
-            if (collision.relativeVelocity.magnitude > VelocityThreshold)
-            {
-                p.Explode();
+        //Vector3 vec = transform.position - pos;
+        //float distance = vec.magnitude;
 
-            }
-        }
+        //vec.y += 5.0f;
+
+        //rb.AddForce(CalculateForce(vec.normalized, distance), ForceMode.Impulse);
+        //rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
     }
 }
