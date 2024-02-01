@@ -61,6 +61,7 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    // TODO:マスを全破壊してしまった場合の処理をどうするか
     void GoToResult()
     {
         m_ResultUI.SetActive(true);

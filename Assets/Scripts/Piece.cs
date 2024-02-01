@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -101,6 +102,9 @@ public class Piece : MonoBehaviour
             else if (collider.TryGetComponent<Square>(out var m))
             {
                 // マスのダメージ計算等を用意する
+                Vector3 difference = collider.transform.position - transform.position;
+                // difference.y = 0.1f;
+                m.OnExploded(difference.magnitude, speedOnCollision);
             }
             else
             {
@@ -179,6 +183,7 @@ public class Piece : MonoBehaviour
         if (collision.gameObject.TryGetComponent<Square>(out _))
         {
             var relativeSpeed = collision.relativeVelocity.magnitude;
+            Debug.Log(relativeSpeed);
             if (relativeSpeed > ExplodableSpeedMin)
             {
                 this.Explode(relativeSpeed);

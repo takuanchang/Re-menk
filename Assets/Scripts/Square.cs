@@ -7,7 +7,10 @@ public class Square : MonoBehaviour
     private Material m_material;
 
     private float m_HitPoint;
-    private const float initial_HP = 1.0f;
+    private const float initial_HP = 25.0f;
+
+    [SerializeField]
+    private float m_explosionParam = 0.1f;
 
     public void Initialize()
     {
@@ -42,14 +45,14 @@ public class Square : MonoBehaviour
     }
 
     // マスがダメージを貰う処理
-    public void OnExploded(Vector3 direction, float speed)
+    public void OnExploded(float distance, float speed)
     {
-        //Vector3 vec = transform.position - pos;
-        //float distance = vec.magnitude;
-
-        //vec.y += 5.0f;
-
-        //rb.AddForce(CalculateForce(vec.normalized, distance), ForceMode.Impulse);
-        //rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
+        // TODO:倍率は要調整
+        m_HitPoint -= m_explosionParam * speed / distance;
+        Debug.Log(m_HitPoint);
+        if (m_HitPoint < 0)
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
