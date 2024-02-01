@@ -4,15 +4,29 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    private static readonly float VelocityThreshold = 5.0f;
+    private Material m_material;
 
-    /*
-    // Start is called before the first frame update
-    void Start()
+    private float m_HitPoint;
+    private const float initial_HP = 25.0f;
+
+    [SerializeField]
+    private float m_explosionParam = 0.1f;
+
+    public void Initialize()
     {
-        //ToDo
+        m_material = GetComponent<Renderer>().material;
+        m_material.EnableKeyword("_EMISSION");
+        m_material.EnableKeyword("_EmissionColor");
+
+        m_HitPoint = initial_HP;
     }
 
+    void Start()
+    {
+        Initialize();
+    }
+
+    /*
     // Update is called once per frame
     void Update()
     {
@@ -20,14 +34,25 @@ public class Square : MonoBehaviour
     }
     */
 
-    private void OnCollisionEnter(Collision collision)
+    // TODO:要調整
+    public void TurnOn()
     {
-        if (collision.gameObject.TryGetComponent<Piece>(out var p))
+        m_material.SetColor("_EmissionColor", Color.red);
+    }
+    public void TurnOff()
+    {
+        m_material.SetColor("_EmissionColor", Color.black);
+    }
+
+    // マスがダメージを貰う処理
+    public void OnExploded(float distance, float speed)
+    {
+        // TODO:倍率は要調整
+        m_HitPoint -= m_explosionParam * speed / distance;
+        Debug.Log(m_HitPoint);
+        if (m_HitPoint < 0)
         {
-            if (collision.relativeVelocity.magnitude > VelocityThreshold)
-            {
-                p.Explode();
-            }
+            gameObject.SetActive(false);
         }
     }
 }
