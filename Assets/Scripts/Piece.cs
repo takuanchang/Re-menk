@@ -9,7 +9,6 @@ public class Piece : MonoBehaviour
 {
     private bool m_isDead = false;
     private Rigidbody rb;
-    // private GameObject m_Particle;
 
     [SerializeField]
     private float m_explosionParam = 2.0f;
@@ -27,7 +26,10 @@ public class Piece : MonoBehaviour
     // 爆発出来る速さの最小値
     private static readonly float ExplodableSpeedMin = 5.0f;
     [SerializeField]
-    private GameObject m_Particle;
+    private GameObject m_SpeedEffect;
+    [SerializeField]
+    private ParticleSystem m_ExplosionEffect;
+
 
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
@@ -62,11 +64,14 @@ public class Piece : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeAll;
 
         // Shoot時に表示するエフェクトを非表示にする
-        m_Particle.SetActive(false);
+        m_SpeedEffect.SetActive(false);
         if (initialTeam == Team.White)
         {
-            m_Particle.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 180.0f);
+            m_SpeedEffect.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 180.0f);
         }
+
+        m_ExplosionEffect.Stop();
+        m_ExplosionEffect.Clear();
 
         // フラグを切る
         m_isDead = false;
@@ -94,6 +99,8 @@ public class Piece : MonoBehaviour
 
     public void Explode(float speedOnCollision)
     {
+        m_ExplosionEffect.Play();
+
         // 近くにあるコライダーを取得
         const float radius = 2.0f;
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
@@ -151,7 +158,7 @@ public class Piece : MonoBehaviour
 
     public void Shoot(Vector3 dir)
     {
-        m_Particle.SetActive(true);
+        m_SpeedEffect.SetActive(true);
 
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.None;
