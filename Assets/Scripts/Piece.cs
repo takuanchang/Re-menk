@@ -194,6 +194,8 @@ public class Piece : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        m_SpeedEffect.SetActive(false);
+
         if (collision.gameObject.TryGetComponent<Piece>(out var p))
         {
             // TODO:当たったのが駒の時、何か考えてもいいかも
