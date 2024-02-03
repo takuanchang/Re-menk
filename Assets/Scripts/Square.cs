@@ -9,6 +9,8 @@ public class Square : MonoBehaviour
     private float m_HitPoint;
     private const float initial_HP = 25.0f;
 
+    public BrokenEffectCollector m_BrokenEffectCollector;
+
     [SerializeField]
     private float m_explosionParam = 0.1f;
 
@@ -52,7 +54,13 @@ public class Square : MonoBehaviour
         Debug.Log(m_HitPoint);
         if (m_HitPoint < 0)
         {
+            m_BrokenEffectCollector.PlayEffect(this.transform.position);
             gameObject.SetActive(false);
         }
+    }
+
+    public void SetEffectCollector(BrokenEffectCollector tmp)
+    {
+        m_BrokenEffectCollector = tmp;
     }
 }

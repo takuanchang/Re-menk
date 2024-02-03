@@ -147,3 +147,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_explosionParam: 0.1
+  m_BrokenEffectsCollector: {fileID: 0}

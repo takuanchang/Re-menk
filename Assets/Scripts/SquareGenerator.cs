@@ -13,6 +13,9 @@ public class SquareGenerator : MonoBehaviour
     [SerializeField]
     private GameObject m_Piece;
 
+    [SerializeField]
+    private BrokenEffectCollector m_BrokenEffectCollector;
+
     int m_Length = 8;
     private Vector3 m_CenterOffset = new Vector3(-3.5f, 0, -3.5f);
 
@@ -25,6 +28,7 @@ public class SquareGenerator : MonoBehaviour
             var column = i / m_Length;
             var position = new Vector3(row, 0, column) + m_CenterOffset;
             var square = Instantiate(m_Square, position, Quaternion.identity, transform);
+            square.GetComponent<Square>().SetEffectCollector(m_BrokenEffectCollector);
         }
     }
 
