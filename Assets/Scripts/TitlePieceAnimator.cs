@@ -7,6 +7,11 @@ public class TitlePieceAnimator : MonoBehaviour
     [SerializeField] private GameObject m_Piece;
     private Queue<(GameObject gameObject, float spawnedTime)> m_gameObjectAndSpawnedTime = new Queue<(GameObject gameObject, float spawnedTime)>();
 
+    /// <summary>
+    /// 生成した駒が消える秒数
+    /// </summary>
+    const float TimeLimit = 1.5f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,7 +20,7 @@ public class TitlePieceAnimator : MonoBehaviour
 
     private void Update()
     {
-        if(m_gameObjectAndSpawnedTime.Peek().spawnedTime + 1.5f < Time.time) // キューの先頭にあるコマが発生から1.5秒経っていれば削除する
+        if(m_gameObjectAndSpawnedTime.Peek().spawnedTime + TimeLimit < Time.time) // キューの先頭にあるコマが発生からTimeLimit秒経っていれば削除する
         {
             (GameObject targetObject, float time) target = m_gameObjectAndSpawnedTime.Dequeue();
             Destroy(target.targetObject);

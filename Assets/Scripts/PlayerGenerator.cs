@@ -20,17 +20,36 @@ public class PlayerGenerator : MonoBehaviour
     [SerializeField] private GameObject m_TurnManager;
     [SerializeField] private UiPrinter m_UiPrinter;
 
+    /// <summary>
+    /// ピースを管理しているゲームオブジェクト名
+    /// </summary>
+    const string PiecesManager = "PiecesManager";
+
+    /// <summary>
+    /// マスを管理しているゲームオブジェクト名
+    /// </summary>
+    const string Board = "Board";
+
+    /// <summary>
+    /// 操作可能な時のfreelookカメラの設定
+    /// </summary>
+    const int PlayableFreeLookPriority = 8;
+    /// <summary>
+    /// 操作不可能な時のfreelookカメラの設定
+    /// </summary>
+    const int NonplayableFreeLookPriority = 11;
+
     public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum)
     {
 
-        var piecesManager = GameObject.Find("PiecesManager").GetComponent<PiecesManager>();
-        Transform board = GameObject.Find("Board").transform;
+        var piecesManager = GameObject.Find(PiecesManager).GetComponent<PiecesManager>();
+        Transform board = GameObject.Find(Board).transform;
 
         var playersNum = humanNum + cpuNum;
         List<IPlayer> players = new List<IPlayer>();
 
-        int freeLookPriority = 8; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
-                                  // 誰から開始か、どのタイミングで決める？
+        int freeLookPriority = PlayableFreeLookPriority; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
+                                                         // 誰から開始か、どのタイミングで決める？
 
         for (int i = 0; i < humanNum; i++)
         {
@@ -65,7 +84,7 @@ public class PlayerGenerator : MonoBehaviour
 
             humanPlayer.SetupCameras(mainCamera, freeLookBase, pieceCameraBase);
 
-            freeLookPriority = 11;
+            freeLookPriority = NonplayableFreeLookPriority;
         }
 
         CinemachineSmoothPath cinemachineSmoothPath = GameObject.Find("DollyTrack").GetComponent<CinemachineSmoothPath>();

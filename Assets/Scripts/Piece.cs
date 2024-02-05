@@ -24,10 +24,22 @@ public class Piece : MonoBehaviour
     /// </summary>
     public Team Team { get; private set; } = Team.None;
 
-    // 爆発出来る速さの最小値
+    /// <summary>
+    /// 爆発出来る速さの最小値
+    /// </summary>
     private static readonly float ExplodableSpeedMin = 5.0f;
     [SerializeField]
     private GameObject m_Particle;
+
+    /// <summary>
+    /// 爆発時インパルスで追加する上方向ベクトル
+    /// </summary>
+    private static readonly float AddedYOnExploded = 5.0f;
+
+    /// <summary>
+    /// 駒を利用不可にする高さ
+    /// </summary>
+    private static readonly float YMinLimit = -10;
 
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
@@ -142,7 +154,7 @@ public class Piece : MonoBehaviour
         Vector3 vec = transform.position - pos;
         float distance = vec.magnitude;
 
-        vec.y += 5.0f;
+        vec.y += AddedYOnExploded;
 
         rb.AddForce(CalculateForce(vec.normalized, distance), ForceMode.Impulse);
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
@@ -165,7 +177,7 @@ public class Piece : MonoBehaviour
 
     private bool ShouldBeDisabled()
     {
-        return transform.position.y < -10;
+        return transform.position.y < YMinLimit;
     }
 
     // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意

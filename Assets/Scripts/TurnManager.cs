@@ -36,6 +36,11 @@ public class TurnManager : MonoBehaviour
     [SerializeField]
     private PiecesManager m_PiecesManager;
 
+    /// <summary>
+    /// このプレイヤーからスタートする
+    /// </summary>
+    const int StartPlayer = 0;
+
     public int CurrentPlayer
     {
         get => m_currentPlayer;
@@ -101,7 +106,7 @@ public class TurnManager : MonoBehaviour
         m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
 
         // リバーシは黒が先行
-        CurrentPlayer = 0;
+        CurrentPlayer = StartPlayer;
         m_Players[CurrentPlayer].PrepareNextPiece();
 
         // 仕方ないがUIプリンターにプレイヤー情報を入れる

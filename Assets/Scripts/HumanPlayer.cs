@@ -63,6 +63,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     [SerializeField] private float directionParam = 3.0f;
     [SerializeField] private float speedParam = 1.0f;
 
+    /// <summary>
+    /// ピースの高さ
+    /// </summary>
+    private static readonly float PiecePositionY = 3.0f;
+
     readonly struct MouseLog {
         public readonly float deltaTime;
         public readonly Vector3 position;
@@ -117,7 +122,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         // カメラを俯瞰視点にする
         m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_FreeLookCamera.Priority = 8;
+        m_FreeLookCamera.Priority = 9;
 
         return true;
     }
@@ -203,7 +208,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                         // 駒の位置変更
                         Vector3 pos = col.transform.position;
-                        pos.y = 3.0f;
+                        pos.y = PiecePositionY;
                         m_Target.transform.position = pos;
 
                         m_SquareCollider = col;

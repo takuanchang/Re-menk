@@ -52,6 +52,16 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
     private string m_Phase = "SquareSelect";
 
+    /// <summary>
+    /// ピースの高さ
+    /// </summary>
+    private static readonly float PiecePositionY = 3.0f;
+
+    /// <summary>
+    /// 待機時間
+    /// </summary>
+    private static readonly float DelayTime = 1.0f;
+
     public string CurrentPhaseString()
     {
         return m_Phase;
@@ -105,7 +115,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         // カメラを俯瞰視点にする
         m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_WaitTimeCamera.Priority = 8;
+        m_WaitTimeCamera.Priority = 9;
 
         _ = ExecuteTurn();
 
@@ -117,28 +127,29 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         // === マス選択 start ===
         m_Phase = "SquareSelect";
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1.0f)); // カメラ移動待ち
+        await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
+        // TODO:コンピュータのみ穴が空いたマスを選択する可能性がある
         const float positionAdjustmentValue = 0.5f;
         float posX = UnityEngine.Random.Range(-4, 4) + positionAdjustmentValue;
         float posZ = UnityEngine.Random.Range(-4, 4) + positionAdjustmentValue;
-        Vector3 pos = new Vector3(posX, 3.0f, posZ);
+        Vector3 pos = new Vector3(posX, PiecePositionY, posZ);
         m_Target.transform.position = pos;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1.0f)); // 人間が目視できるように待ち時間を設定
+        await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // 人間が目視できるように待ち時間を設定
 
         m_PieceCamera.Follow = m_Target.transform;
         m_PieceCamera.LookAt = m_Target.transform;
         m_PieceCamera.Priority = 11;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1.0f)); // カメラ移動待ち
+        await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
         // === マス選択 end ===
 
         // === コマ投げ start ===
         m_Phase = "PieceThrow";
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1.0f)); // すぐ投げられるとびっくりするので待つ
+        await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // すぐ投げられるとびっくりするので待つ
 
         m_PieceCamera.Priority = 9;
         m_WaitTimeCamera.Priority = 11;

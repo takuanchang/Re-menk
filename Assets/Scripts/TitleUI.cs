@@ -27,6 +27,11 @@ public class TitleUI : MonoBehaviour
 
     private SettingManager setting;
 
+    /// <summary>
+    /// 読み込むゲームシーン名
+    /// </summary>
+    const string GameSceneName = "Main";
+
     public void Start()
     {
         setting = FindObjectOfType<SettingManager>();
@@ -34,7 +39,7 @@ public class TitleUI : MonoBehaviour
 
     public void ChangeToGameScene()
     {
-        SceneManager.LoadScene("Main");
+        SceneManager.LoadScene(GameSceneName);
     }
 
     public void ExitGame()
