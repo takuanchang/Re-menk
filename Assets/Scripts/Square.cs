@@ -7,7 +7,7 @@ public class Square : MonoBehaviour
     private Material m_material;
 
     private float m_HitPoint;
-    private const float initial_HP = 25.0f;
+    private const float initial_HP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
 
     public BrokenEffectCollector m_BrokenEffectCollector;
 

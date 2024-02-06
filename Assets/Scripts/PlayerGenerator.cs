@@ -33,7 +33,7 @@ public class PlayerGenerator : MonoBehaviour
     /// <summary>
     /// 操作可能な時のfreelookカメラの設定
     /// </summary>
-    const int PlayableFreeLookPriority = 8;
+    const int PlayableFreeLookPriority = 9;
     /// <summary>
     /// 操作不可能な時のfreelookカメラの設定
     /// </summary>

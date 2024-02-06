@@ -58,9 +58,20 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     private static readonly float PiecePositionY = 3.0f;
 
     /// <summary>
+    /// 使用しているカメラの優先度
+    /// </summary>
+    private static readonly int UsingPriority = 11;
+    /// <summary>
+    /// 使用していないカメラの優先度
+    /// </summary>
+    private static readonly int NonUsingPriority = 9;
+
+    /// <summary>
     /// 待機時間
     /// </summary>
     private static readonly float DelayTime = 1.0f;
+
+
 
     public string CurrentPhaseString()
     {
@@ -114,8 +125,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         IsPlayable = true;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_WaitTimeCamera.Priority = 9;
+        m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        m_WaitTimeCamera.Priority = NonUsingPriority;
 
         _ = ExecuteTurn();
 
@@ -140,7 +151,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         m_PieceCamera.Follow = m_Target.transform;
         m_PieceCamera.LookAt = m_Target.transform;
-        m_PieceCamera.Priority = 11;
+        m_PieceCamera.Priority = UsingPriority;
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
@@ -151,8 +162,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // すぐ投げられるとびっくりするので待つ
 
-        m_PieceCamera.Priority = 9;
-        m_WaitTimeCamera.Priority = 11;
+        m_PieceCamera.Priority = NonUsingPriority;
+        m_WaitTimeCamera.Priority = UsingPriority;
 
         var dir = CalcurateDirection();
         dir.y = CalculateSpeed();

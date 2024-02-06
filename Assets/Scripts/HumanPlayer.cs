@@ -68,6 +68,15 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// </summary>
     private static readonly float PiecePositionY = 3.0f;
 
+    /// <summary>
+    /// 使用しているカメラの優先度
+    /// </summary>
+    private static readonly int UsingPriority = 11;
+    /// <summary>
+    /// 使用していないカメラの優先度
+    /// </summary>
+    private static readonly int NonUsingPriority = 9;
+
     readonly struct MouseLog {
         public readonly float deltaTime;
         public readonly Vector3 position;
@@ -121,8 +130,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         m_Phase = Phase.SquareSelect;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_FreeLookCamera.Priority = 9;
+        m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        m_FreeLookCamera.Priority = NonUsingPriority;
 
         return true;
     }
@@ -230,7 +239,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                     m_PieceCamera.Follow = m_Target.transform;
                     m_PieceCamera.LookAt = m_Target.transform;
-                    m_PieceCamera.Priority = 11;
+                    m_PieceCamera.Priority = UsingPriority;
                 }
 
                 break;
@@ -240,7 +249,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = 9;
+                    m_PieceCamera.Priority = NonUsingPriority;
                     break;
                 }
                 if (Input.GetMouseButtonDown(0))
@@ -256,7 +265,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = 9;
+                    m_PieceCamera.Priority = NonUsingPriority;
                     break;
                 }
 
@@ -272,8 +281,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    m_PieceCamera.Priority = 9;
-                    m_FreeLookCamera.Priority = 11;
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    m_FreeLookCamera.Priority = UsingPriority;
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);
                     Throw(dir);
