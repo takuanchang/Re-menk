@@ -5,13 +5,10 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class SquareGenerator : MonoBehaviour
+public class SquaresManager : MonoBehaviour
 {
     [SerializeField]
-    private GameObject m_Square;
-
-    [SerializeField]
-    private GameObject m_Piece;
+    private Square m_Square;
 
     [SerializeField]
     private BrokenEffectCollector m_BrokenEffectCollector;
@@ -19,16 +16,25 @@ public class SquareGenerator : MonoBehaviour
     int m_Length = 8;
     private Vector3 m_CenterOffset = new Vector3(-3.5f, 0, -3.5f);
 
+    private List<Square> m_Squares = null;
+    private SortedSet<int> m_ValidIndices = null;
+    public IEnumerable<int> ValidIndices => m_ValidIndices;
+
     public void InitializeBoard()
     {
         int count = m_Length * m_Length;
-        for (int i = 0; i < count; i++)
+        m_Squares = new List<Square> (count);
+        m_ValidIndices = new();
+
+        for (int squareIndex = 0; squareIndex < count; squareIndex++)
         {
-            var row = i % m_Length;
-            var column = i / m_Length;
+            var row = squareIndex % m_Length;
+            var column = squareIndex / m_Length;
             var position = new Vector3(row, 0, column) + m_CenterOffset;
             var square = Instantiate(m_Square, position, Quaternion.identity, transform);
-            square.GetComponent<Square>().SetEffectCollector(m_BrokenEffectCollector);
+            square.SetEffectCollector(m_BrokenEffectCollector);
+            m_Squares.Add(square);
+            m_ValidIndices.Add(squareIndex);
         }
     }
 

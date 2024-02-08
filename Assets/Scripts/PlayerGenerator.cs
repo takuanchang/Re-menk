@@ -43,7 +43,9 @@ public class PlayerGenerator : MonoBehaviour
     {
 
         var piecesManager = GameObject.Find(PiecesManager).GetComponent<PiecesManager>();
-        Transform board = GameObject.Find(Board).transform;
+        var boardObject = GameObject.Find(Board);
+        var board = boardObject.transform;
+        SquaresManager squaresManager = board.GetComponent<SquaresManager>();
 
         var playersNum = humanNum + cpuNum;
         List<IPlayer> players = new List<IPlayer>();
@@ -94,6 +96,7 @@ public class PlayerGenerator : MonoBehaviour
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
             computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // 3人以上の時Team等要修正
+            computerPlayer.RegisterSquaresManager(squaresManager);
             players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
