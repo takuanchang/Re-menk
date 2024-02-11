@@ -28,7 +28,7 @@ public class PlayerGenerator : MonoBehaviour
     /// <summary>
     /// マスを管理しているゲームオブジェクト名
     /// </summary>
-    const string Board = "Board";
+    const string BoardObjectName = "Board";
 
     /// <summary>
     /// 操作可能な時のfreelookカメラの設定
@@ -43,9 +43,9 @@ public class PlayerGenerator : MonoBehaviour
     {
 
         var piecesManager = GameObject.Find(PiecesManager).GetComponent<PiecesManager>();
-        var boardObject = GameObject.Find(Board);
-        var board = boardObject.transform;
-        SquaresManager squaresManager = board.GetComponent<SquaresManager>();
+        var boardObject = GameObject.Find(BoardObjectName);
+        var boardRoot = boardObject.transform;
+        Board board = boardObject.GetComponent<Board>();
 
         var playersNum = humanNum + cpuNum;
         List<IPlayer> players = new List<IPlayer>();
@@ -69,15 +69,15 @@ public class PlayerGenerator : MonoBehaviour
             selectCamera.layer = myLayer;
             selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
             Cinemachine.CinemachineVirtualCameraBase selectCameraBase = selectCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
-            selectCameraBase.Follow = board;
-            selectCameraBase.LookAt = board;
+            selectCameraBase.Follow = boardRoot;
+            selectCameraBase.LookAt = boardRoot;
 
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
             Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             freeLookBase.Priority = freeLookPriority;
-            freeLookBase.Follow = board;
-            freeLookBase.LookAt = board;
+            freeLookBase.Follow = boardRoot;
+            freeLookBase.LookAt = boardRoot;
 
             GameObject pieceCamera = Instantiate(m_PieceCameraPrefab);
             pieceCamera.layer = myLayer;
@@ -96,7 +96,7 @@ public class PlayerGenerator : MonoBehaviour
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
             computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // 3人以上の時Team等要修正
-            computerPlayer.RegisterSquaresManager(squaresManager);
+            computerPlayer.RegisterBoard(board);
             players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -107,16 +107,16 @@ public class PlayerGenerator : MonoBehaviour
             selectCamera.layer = myLayer;
             selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
             Cinemachine.CinemachineVirtualCameraBase selectCameraBase = selectCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
-            selectCameraBase.Follow = board;
-            selectCameraBase.LookAt = board;
+            selectCameraBase.Follow = boardRoot;
+            selectCameraBase.LookAt = boardRoot;
 
             GameObject DollyCamera = Instantiate(m_DollyCameraPrefab);
             DollyCamera.layer = myLayer;
             DollyCamera.GetComponent<CinemachineDollyCart>().m_Path = cinemachineSmoothPath;
             Cinemachine.CinemachineVirtualCameraBase DollyCameraBase = DollyCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             DollyCameraBase.Priority = freeLookPriority;
-            DollyCameraBase.Follow = board;
-            DollyCameraBase.LookAt = board;
+            DollyCameraBase.Follow = boardRoot;
+            DollyCameraBase.LookAt = boardRoot;
 
             GameObject pieceCamera = Instantiate(m_PieceCameraPrefab);
             pieceCamera.layer = myLayer;

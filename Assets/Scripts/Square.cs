@@ -9,10 +9,20 @@ public class Square : MonoBehaviour
     private float m_HitPoint;
     private const float initial_HP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
 
-    public BrokenEffectCollector m_BrokenEffectCollector;
-
     [SerializeField]
     private float m_explosionParam = 0.1f;
+
+    private Board m_Board = null;
+    private int m_Index = -1;
+
+    public void RegisterBoard(Board board)
+    {
+        m_Board = board;
+    }
+    public void RegisterIndex(int index)
+    {
+        m_Index = index;
+    }
 
     public void Initialize()
     {
@@ -54,13 +64,7 @@ public class Square : MonoBehaviour
         Debug.Log(m_HitPoint);
         if (m_HitPoint < 0)
         {
-            m_BrokenEffectCollector.PlayEffect(this.transform.position);
-            gameObject.SetActive(false);
+            m_Board.BreakSquare(m_Index);
         }
-    }
-
-    public void SetEffectCollector(BrokenEffectCollector tmp)
-    {
-        m_BrokenEffectCollector = tmp;
     }
 }

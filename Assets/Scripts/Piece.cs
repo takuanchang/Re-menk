@@ -111,7 +111,7 @@ public class Piece : MonoBehaviour
 
     public void Explode(float speedOnCollision)
     {
-        m_ExplosionEffect.Play();
+        //m_ExplosionEffect.Play();
 
         // 近くにあるコライダーを取得
         const float radius = 2.0f;

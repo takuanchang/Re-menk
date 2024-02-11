@@ -35,7 +35,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     private Piece m_Target;
 
     private PiecesManager m_PiecesManager;
-    private SquaresManager m_SquaresManager;
+    private Board m_Board;
 
     [SerializeField]
     private Camera m_MainCamera;
@@ -96,9 +96,9 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_PiecesManager = piecesManager;
     }
 
-    public void RegisterSquaresManager(SquaresManager squaresManager)
+    public void RegisterBoard(Board board)
     {
-        m_SquaresManager = squaresManager;
+        m_Board = board;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
