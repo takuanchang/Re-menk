@@ -146,11 +146,11 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
-        // TODO:コンピュータのみ穴が空いたマスを選択する可能性がある
-        const float positionAdjustmentValue = 0.5f;
-        float posX = UnityEngine.Random.Range(-4, 4) + positionAdjustmentValue;
-        float posZ = UnityEngine.Random.Range(-4, 4) + positionAdjustmentValue;
-        Vector3 pos = new Vector3(posX, PiecePositionY, posZ);
+        // TODO:マスが全破壊された場合の処理を考えるべき(勝敗条件など、Boardで破壊を通知された時等)
+        IReadOnlyList<int> validSquareIndices = m_Board.ValidIndices;
+        int selectedSquareId = validSquareIndices[UnityEngine.Random.Range(0, validSquareIndices.Count)];
+        Vector3 pos = m_Board.GetSquarePosition(selectedSquareId);
+        pos.y = PiecePositionY;
         m_Target.transform.position = pos;
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // 人間が目視できるように待ち時間を設定

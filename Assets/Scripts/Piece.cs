@@ -215,7 +215,7 @@ public class Piece : MonoBehaviour
         if (collision.gameObject.TryGetComponent<Square>(out _))
         {
             var relativeSpeed = collision.relativeVelocity.magnitude;
-            Debug.Log(relativeSpeed);
+            // Debug.Log(relativeSpeed);
             if (relativeSpeed > ExplodableSpeedMin)
             {
                 this.Explode(relativeSpeed);
