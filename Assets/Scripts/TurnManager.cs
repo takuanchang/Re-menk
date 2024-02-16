@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
 using Cysharp.Threading.Tasks;
 using static HumanPlayer;
-using System;
 
 public class TurnManager : MonoBehaviour
 {
@@ -38,6 +39,8 @@ public class TurnManager : MonoBehaviour
 
     [SerializeField]
     private Board m_Board;
+
+    private CancellationTokenSource m_CancellationTokenSource = null;
 
     /// <summary>
     /// このプレイヤーからスタートする
@@ -100,6 +103,17 @@ public class TurnManager : MonoBehaviour
         _ = EndTurn();
     }
 
+    public void ResetEndTurn()
+    {
+        if(m_CancellationTokenSource != null)
+        {
+            m_CancellationTokenSource.Cancel();
+            m_CancellationTokenSource.Dispose();
+            m_CancellationTokenSource = null;
+        }
+        _ = EndTurn();
+    }
+
     void Start()
     {
         var setting = FindObjectOfType<SettingManager>();
@@ -120,11 +134,19 @@ public class TurnManager : MonoBehaviour
 
     private async UniTaskVoid EndTurn()
     {
+        m_CancellationTokenSource = new CancellationTokenSource();
+        await EndTurnCore(m_CancellationTokenSource.Token);
+        m_CancellationTokenSource.Dispose();
+        m_CancellationTokenSource = null;
+    }
+
+    private async UniTask EndTurnCore(CancellationToken token)
+    {
         float time = 0.0f;
         // 全ピースが止まるか待機時間がMaxWaitを超えると抜け出す
         while (!m_PiecesManager.IsStableAll() && time < MaxWait)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(Span));
+            await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken:token);
             time += Span;
         }
         PlayerChange();

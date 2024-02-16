@@ -5,6 +5,9 @@ using UnityEngine.UIElements;
 
 public class PiecesManager : MonoBehaviour
 {
+    [SerializeField]
+    private TurnManager m_TurnManager;
+
     List<Piece> m_Pieces = new List<Piece>();
     [SerializeField]
     private Piece m_OriginalPiece;
@@ -14,7 +17,7 @@ public class PiecesManager : MonoBehaviour
     {
         var position = InitialPosition;
         var piece = Instantiate(m_OriginalPiece, position, Quaternion.identity, transform);
-        piece.Initialize(team);
+        piece.Initialize(team, this);
 
         m_Pieces.Add(piece);
         return piece;  
@@ -27,5 +30,10 @@ public class PiecesManager : MonoBehaviour
             if (!piece.IsStable()) return false;
         }
         return true;
+    }
+
+    public void RequestResetEndTurn()
+    {
+        m_TurnManager.ResetEndTurn();
     }
 }
