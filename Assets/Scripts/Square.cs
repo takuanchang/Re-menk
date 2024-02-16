@@ -7,25 +7,24 @@ public class Square : MonoBehaviour
     private Material m_material;
 
     private float m_HitPoint;
-    private const float initial_HP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
-
-    public BrokenEffectCollector m_BrokenEffectCollector;
+    private const float initialHP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
 
     [SerializeField]
     private float m_explosionParam = 0.1f;
 
-    public void Initialize()
+    private Board m_Owner = null;
+    private int m_Index = -1;
+
+    public void Initialize(Board owner, int index)
     {
         m_material = GetComponent<Renderer>().material;
         m_material.EnableKeyword("_EMISSION");
         m_material.EnableKeyword("_EmissionColor");
 
-        m_HitPoint = initial_HP;
-    }
+        m_HitPoint = initialHP;
 
-    void Start()
-    {
-        Initialize();
+        m_Owner = owner;
+        m_Index = index;
     }
 
     /*
@@ -51,16 +50,10 @@ public class Square : MonoBehaviour
     {
         // TODO:倍率は要調整
         m_HitPoint -= m_explosionParam * speed / distance;
-        Debug.Log(m_HitPoint);
+        // Debug.Log(m_HitPoint);
         if (m_HitPoint < 0)
         {
-            m_BrokenEffectCollector.PlayEffect(this.transform.position);
-            gameObject.SetActive(false);
+            m_Owner.BreakSquare(m_Index);
         }
-    }
-
-    public void SetEffectCollector(BrokenEffectCollector tmp)
-    {
-        m_BrokenEffectCollector = tmp;
     }
 }

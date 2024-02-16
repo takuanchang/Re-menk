@@ -37,7 +37,7 @@ public class TurnManager : MonoBehaviour
     private PiecesManager m_PiecesManager;
 
     [SerializeField]
-    private SquaresManager m_SquaresManager;
+    private Board m_Board;
 
     /// <summary>
     /// このプレイヤーからスタートする
@@ -106,7 +106,7 @@ public class TurnManager : MonoBehaviour
         int humanNum = setting.HumanNum;
         int cpuNum = setting.ComputerNum;
 
-        m_SquaresManager.InitializeBoard();
+        m_Board.InitializeBoard();
         m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
 
         // リバーシは黒が先行
