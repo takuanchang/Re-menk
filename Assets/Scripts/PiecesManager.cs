@@ -32,6 +32,14 @@ public class PiecesManager : MonoBehaviour
         return true;
     }
 
+    public void StopPiecesMove()
+    {
+        foreach (var piece in m_Pieces)
+        {
+            piece.Stop();
+        }
+    }
+
     public void RequestResetEndTurn()
     {
         m_TurnManager.ResetEndTurn();

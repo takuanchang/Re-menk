@@ -14,7 +14,7 @@ public class TurnManager : MonoBehaviour
 
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
-    private static readonly float MaxWait = 6.0f;
+    private static readonly float MaxWait = 2.0f;
     private static readonly float Span = 1.0f;
 
     private List<IPlayer> m_Players;
@@ -148,6 +148,12 @@ public class TurnManager : MonoBehaviour
         {
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken:token);
             time += Span;
+        }
+        if(time >= MaxWait)
+        {
+            // TODO: 止めても揺れはおさまらない為コライダーの変更か位置移動(滑り)必須？
+            m_PiecesManager.StopPiecesMove();
+            await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
         PlayerChange();
         // m_isWaiting = false;

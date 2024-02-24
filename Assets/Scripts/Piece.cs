@@ -184,6 +184,12 @@ public class Piece : MonoBehaviour
         rb.AddForce(dir, ForceMode.Impulse);
     }
 
+    public void Stop()
+    {
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
     public bool IsStable()
     {
         return rb.IsSleeping() || m_isDead;
