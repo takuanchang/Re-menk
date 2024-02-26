@@ -7,6 +7,8 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
 {
+    private PiecesManager m_PiecesManager = null;
+
     private bool m_isDead = false;
     private Rigidbody rb;
 
@@ -47,11 +49,13 @@ public class Piece : MonoBehaviour
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
     /// </summary>
     /// <param name="initialTeam">初期状態のチーム</param>
-    public void Initialize(Team initialTeam) {
+    public void Initialize(Team initialTeam, PiecesManager piecesManager) {
         // 初期化時に無効なチームを設定しようとした場合はアサートする
         Assert.AreNotEqual(initialTeam, Team.None, $"Do NOT set invalid teams at initialization");
         // チームを設定する
         Team = initialTeam;
+        // 管理者を設定
+        m_PiecesManager= piecesManager;
         // チームに応じて向きを設定する
         switch (initialTeam)
         {
@@ -116,6 +120,7 @@ public class Piece : MonoBehaviour
         // 近くにあるコライダーを取得
         const float radius = 2.0f;
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
+
         foreach(var collider in hitColliders)
         {
             if(collider.TryGetComponent<Piece>(out var p))
@@ -165,6 +170,8 @@ public class Piece : MonoBehaviour
 
         rb.AddForce(CalculateForce(vec.normalized, distance), ForceMode.Impulse);
         rb.AddTorque(CalculateTorque(new Vector3(vec.z, 0, -vec.x).normalized, distance), ForceMode.Impulse);
+        // EndTurnの時間を再設定してもらう
+        m_PiecesManager.RequestResetEndTurn();
     }
 
 
@@ -175,6 +182,12 @@ public class Piece : MonoBehaviour
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.None;
         rb.AddForce(dir, ForceMode.Impulse);
+    }
+
+    public void Stop()
+    {
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
 
     public bool IsStable()
