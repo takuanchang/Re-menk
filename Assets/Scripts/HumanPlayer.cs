@@ -44,6 +44,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
     [SerializeField] private float rayLength = 20.0f;
 
+    private Transform m_Reticule;
+    private ReticuleControler m_ReticuleControler;
+
     // フェーズ
     public enum Phase {
         SquareSelect,
@@ -99,6 +102,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+
+        m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
@@ -132,6 +137,10 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         // カメラを俯瞰視点にする
         m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
         m_FreeLookCamera.Priority = NonUsingPriority;
+
+        // レティクルのアニメーションを選択中のものに変更
+        Debug.Log("hoge");
+        m_ReticuleControler.ChangeAnimation(GameState.Selecting);
 
         return true;
     }
@@ -178,6 +187,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     void Start() {
         m_SquareLayerMask = LayerMask.GetMask("Square");
+        m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
     }
 
     // チーム(自身のカメラ)に合わせて向きを調整
@@ -207,18 +217,20 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                     var col = hit.collider;
                     if(col!= m_SquareCollider)
                     {
-                        // 非選択マスを光らせなくする
-                        if (m_SquareCollider != null)
-                        {
-                            m_SquareCollider.GetComponent<Square>().TurnOff();
-                        }
-                        // 選択マスを光らせる
-                        col.GetComponent<Square>().TurnOn();
+                        //// 非選択マスを光らせなくする
+                        //if (m_SquareCollider != null)
+                        //{
+                        //    m_SquareCollider.GetComponent<Square>().TurnOff();
+                        //}
+                        //// 選択マスを光らせる
+                        //col.GetComponent<Square>().TurnOn();
 
                         // 駒の位置変更
                         Vector3 pos = col.transform.position;
                         pos.y = PiecePositionY;
                         m_Target.transform.position = pos;
+                        pos.y = 0.051f;
+                        m_Reticule.position = pos;
 
                         m_SquareCollider = col;
                     }
@@ -258,6 +270,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                     m_MouseHistory.Clear();
                     targetPosition = Input.mousePosition;
                     m_Phase = Phase.PieceThrow;
+                    m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
                 }
                 break;
             // 投げるフェーズ
@@ -266,6 +279,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 {
                     m_Phase = Phase.SquareSelect;
                     m_PieceCamera.Priority = NonUsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Selecting);
                     break;
                 }
 
@@ -283,6 +297,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 {
                     m_PieceCamera.Priority = NonUsingPriority;
                     m_FreeLookCamera.Priority = UsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Threw);
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);
                     Throw(dir);

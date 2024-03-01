@@ -53,6 +53,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
     private string m_Phase = "SquareSelect";
 
+    private Transform m_Reticule;
+
     /// <summary>
     /// ピースの高さ
     /// </summary>
@@ -71,8 +73,6 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     /// 待機時間
     /// </summary>
     private static readonly float DelayTime = 1.0f;
-
-
 
     public string CurrentPhaseString()
     {
@@ -94,6 +94,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+
+        m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
     }
 
     public void RegisterBoard(Board board)
@@ -152,6 +154,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         Vector3 pos = m_Board.GetSquarePosition(selectedSquareId);
         pos.y = PiecePositionY;
         m_Target.transform.position = pos;
+        pos.y = 0.051f;
+        m_Reticule.position = pos;
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // 人間が目視できるように待ち時間を設定
 
