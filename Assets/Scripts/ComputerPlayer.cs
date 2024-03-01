@@ -54,6 +54,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     private string m_Phase = "SquareSelect";
 
     private Transform m_Reticule;
+    private ReticuleControler m_ReticuleControler;
 
     /// <summary>
     /// ピースの高さ
@@ -96,6 +97,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_PiecesManager = piecesManager;
 
         m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
+        m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
     }
 
     public void RegisterBoard(Board board)
@@ -145,6 +147,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     {
         // === マス選択 start ===
         m_Phase = "SquareSelect";
+        m_ReticuleControler.ChangeAnimation(GameState.Selecting);
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
@@ -162,8 +165,14 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_PieceCamera.Follow = m_Target.transform;
         m_PieceCamera.LookAt = m_Target.transform;
         m_PieceCamera.Priority = UsingPriority;
+        if (Team == Team.White)
+        {
+            var body = m_PieceCamera.GetCinemachineComponent<Cinemachine.CinemachineTransposer>();
+            body.m_FollowOffset.z = 5;
+        }
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
+        m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
 
         // === マス選択 end ===
 
@@ -171,6 +180,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_Phase = "PieceThrow";
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // すぐ投げられるとびっくりするので待つ
+        m_ReticuleControler.ChangeAnimation(GameState.Threw);
 
         m_PieceCamera.Priority = NonUsingPriority;
         m_WaitTimeCamera.Priority = UsingPriority;

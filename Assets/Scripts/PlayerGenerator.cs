@@ -67,7 +67,7 @@ public class PlayerGenerator : MonoBehaviour
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
-            selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
+            selectCamera.transform.rotation = Quaternion.Euler(90, 0, 0); // TODO:3人以上の時要修正
             Cinemachine.CinemachineVirtualCameraBase selectCameraBase = selectCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             selectCameraBase.Follow = boardRoot;
             selectCameraBase.LookAt = boardRoot;
@@ -105,7 +105,7 @@ public class PlayerGenerator : MonoBehaviour
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
-            selectCamera.transform.rotation = Quaternion.Euler(90, 180 * (i % 2), 0); // TODO:3人以上の時要修正
+            selectCamera.transform.rotation = Quaternion.Euler(90, 0, 0); // TODO:3人以上の時要修正
             Cinemachine.CinemachineVirtualCameraBase selectCameraBase = selectCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             selectCameraBase.Follow = boardRoot;
             selectCameraBase.LookAt = boardRoot;
