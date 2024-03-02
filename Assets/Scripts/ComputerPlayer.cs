@@ -89,7 +89,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         return Vector3.zero; // とりあえずズレなし
     }
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Joycon joycon)
     {
         Team = team;
         m_TurnManager = turnManager;

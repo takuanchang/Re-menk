@@ -14,7 +14,7 @@ public class TurnManager : MonoBehaviour
 
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
-    private static readonly float MaxWait = 2.0f;
+    private static readonly float MaxWait = 4.0f; // TODO:上投げの閾値などを考えるときにも要チェック
     private static readonly float Span = 1.0f;
 
     private List<IPlayer> m_Players;

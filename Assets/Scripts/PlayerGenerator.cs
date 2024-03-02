@@ -53,12 +53,14 @@ public class PlayerGenerator : MonoBehaviour
         int freeLookPriority = PlayableFreeLookPriority; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
                                                          // 誰から開始か、どのタイミングで決める？
 
+        var joycons = JoyconManager.Instance.j;
+
         for (int i = 0; i < humanNum; i++)
         {
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, joycons.Count > 0 ? joycons[i % joycons.Count] : null); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -74,6 +76,7 @@ public class PlayerGenerator : MonoBehaviour
 
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
+            freeLook.GetComponent<JoyconInputProvider>().Initialize(joycons.Count > 0 ? joycons[i % joycons.Count] : null);
             Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
             freeLookBase.Priority = freeLookPriority;
             freeLookBase.Follow = boardRoot;
@@ -95,7 +98,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // 3人以上の時Team等要修正
+            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, null); // 3人以上の時Team等要修正
             computerPlayer.RegisterBoard(board);
             players.Add(computerPlayer);
 

@@ -80,6 +80,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// </summary>
     private static readonly int NonUsingPriority = 9;
 
+    /// <summary>
+    /// joycon情報、nullの場合はマウス操作
+    /// </summary>
+    Joycon m_Joycon = null;
+
     readonly struct MouseLog {
         public readonly float deltaTime;
         public readonly Vector3 position;
@@ -97,11 +102,12 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     // ------------------------------------------------------------------------------------------
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Joycon joycon)
     {
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+        m_Joycon = joycon;
 
         m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
     }
@@ -198,13 +204,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         return quat * mouseDifference;
     }
 
-    void Update()
+    /// <summary>
+    /// マウス操作の場合
+    /// </summary>
+    private void PlayByMouse()
     {
-        if (!IsPlayable)
-        {
-            return;
-        }
-
         switch (m_Phase)
         {
             // マス選択フェーズ
@@ -215,7 +219,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
                     var col = hit.collider;
-                    if(col!= m_SquareCollider)
+                    if (col != m_SquareCollider)
                     {
                         //// 非選択マスを光らせなくする
                         //if (m_SquareCollider != null)
@@ -310,6 +314,137 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 // 開始点、折り返し点、終点を計算し、補間する点をMouseHistory(現在名)に入れる
 
                 break;
+        }
+    }
+
+
+    /// <summary>
+    /// Joycon操作
+    /// </summary>
+    private void PlayByJoycon()
+    {
+        switch (m_Phase)
+        {
+            // マス選択フェーズ
+            case Phase.SquareSelect:
+                // マウスからレイを飛ばす
+
+                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // TODO:変更の必要あり
+                if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
+                {
+                    var col = hit.collider;
+                    if (col != m_SquareCollider)
+                    {
+                        //// 非選択マスを光らせなくする
+                        //if (m_SquareCollider != null)
+                        //{
+                        //    m_SquareCollider.GetComponent<Square>().TurnOff();
+                        //}
+                        //// 選択マスを光らせる
+                        //col.GetComponent<Square>().TurnOn();
+
+                        // 駒の位置変更
+                        Vector3 pos = col.transform.position;
+                        pos.y = PiecePositionY;
+                        m_Target.transform.position = pos;
+                        pos.y = 0.051f;
+                        m_Reticule.position = pos;
+
+                        m_SquareCollider = col;
+                    }
+                }
+
+                //if (IPlayer~~.checkCanMoveTo~~())
+                //{
+
+                //    IPlayer~~.clear
+                //}
+
+                if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
+                {
+                    m_SquareCollider.GetComponent<Square>().TurnOff();
+                    m_SquareCollider = null;
+
+                    m_Phase = Phase.ButtonUpWait;
+
+                    m_PieceCamera.Follow = m_Target.transform;
+                    m_PieceCamera.LookAt = m_Target.transform;
+                    m_PieceCamera.Priority = UsingPriority;
+                }
+
+                break;
+            // 人間：マウス押し直し待ち
+            // CPU : カメラ移動待ち
+            case Phase.ButtonUpWait: // フェーズの名前が人間依存なので変えたほうがgood
+                if (Input.GetMouseButtonDown(1))
+                {
+                    m_Phase = Phase.SquareSelect;
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    break;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    sumTime = 0.0f;
+                    m_MouseHistory.Clear();
+                    targetPosition = Input.mousePosition;
+                    m_Phase = Phase.PieceThrow;
+                    m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
+                }
+                break;
+            // 投げるフェーズ
+            case Phase.PieceThrow:
+                if (Input.GetMouseButtonDown(1))
+                {
+                    m_Phase = Phase.SquareSelect;
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Selecting);
+                    break;
+                }
+
+                // 人間はこんな感じ
+                float dt = Time.deltaTime;
+                sumTime += dt;
+                var mousePos = Input.mousePosition;
+                m_MouseHistory.Enqueue(new(dt, mousePos));
+                while (sumTime - m_MouseHistory.Peek().deltaTime > threshold)
+                {
+                    var (deltaTime, _) = m_MouseHistory.Dequeue();
+                    sumTime -= deltaTime;
+                }
+                if (Input.GetMouseButtonUp(0))
+                {
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    m_FreeLookCamera.Priority = UsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Threw);
+                    var dir = CalcurateDirection(mousePos);
+                    dir.y = CalculateSpeed(m_MouseHistory);
+                    Throw(dir);
+                    m_TurnManager.SendMessage("OnPieceThrown");
+                }
+
+                // CPU側でもアニメーションを見せるなら数字を決めるだけではだめ
+                // 候補1 : いくつかのアニメーションを用意しておく
+                // 候補2 : その場でいい感じに計算してThrowする
+                // 開始点、折り返し点、終点を計算し、補間する点をMouseHistory(現在名)に入れる
+
+                break;
+        }
+    }
+
+    void Update()
+    {
+        if (!IsPlayable)
+        {
+            return;
+        }
+
+        if (m_Joycon == null)
+        {
+            PlayByMouse();
+        }
+        else
+        {
+            PlayByJoycon();
         }
     }
 }
