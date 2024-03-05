@@ -31,10 +31,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     private int m_SquareLayerMask;
 
     private Piece m_Target;
-    // 選択中のマスのコライダー
-    private Collider m_SquareCollider = null;
+    // 選択中のマスのインデックス
+    private int? m_SelectingIndex = null;
 
     private PiecesManager m_PiecesManager;
+    private Board m_Board;
 
     [SerializeField] private Camera m_MainCamera;
     // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
@@ -102,14 +103,19 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     // ------------------------------------------------------------------------------------------
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Joycon joycon)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Board board, Joycon joycon)
     {
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+        m_Board = board;
         m_Joycon = joycon;
 
-        m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
+        m_SelectingIndex = m_Board.GetCenterIndex();
+
+        var reticuleObject = GameObject.Find("Reticule");
+        m_Reticule = reticuleObject.GetComponent<Transform>();
+        m_ReticuleControler = reticuleObject.GetComponent<ReticuleControler>();
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
@@ -147,6 +153,12 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         // レティクルのアニメーションを選択中のものに変更
         Debug.Log("hoge");
         m_ReticuleControler.ChangeAnimation(GameState.Selecting);
+
+        // 選択ポジションの初期化
+        if(m_SelectingIndex.HasValue)
+        {
+            SelectSquare(m_SelectingIndex.Value);
+        }
 
         return true;
     }
@@ -193,7 +205,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     void Start() {
         m_SquareLayerMask = LayerMask.GetMask("Square");
-        m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
+        //m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
     }
 
     // チーム(自身のカメラ)に合わせて向きを調整
@@ -202,6 +214,23 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         var roty = m_MainCamera.transform.rotation.eulerAngles.y;
         var quat = Quaternion.AngleAxis(roty, Vector3.up);
         return quat * mouseDifference;
+    }
+
+    private void SelectSquare(int squareNewIndex)
+    {
+        //if (squareNewIndex == m_SelectingIndex)
+        //{
+        //    return;
+        //}
+
+        // 駒の位置変更
+        Vector3 pos = m_Board.GetSquare(squareNewIndex).transform.position;
+        pos.y = PiecePositionY;
+        m_Target.transform.position = pos;
+        pos.y = 0.051f;
+        m_Reticule.position = pos;
+
+        m_SelectingIndex = squareNewIndex;
     }
 
     /// <summary>
@@ -216,41 +245,18 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 // マウスからレイを飛ばす
 
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
+
                 if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
-                    var col = hit.collider;
-                    if (col != m_SquareCollider)
+                    if(hit.collider.TryGetComponent<Square>(out var square))
                     {
-                        //// 非選択マスを光らせなくする
-                        //if (m_SquareCollider != null)
-                        //{
-                        //    m_SquareCollider.GetComponent<Square>().TurnOff();
-                        //}
-                        //// 選択マスを光らせる
-                        //col.GetComponent<Square>().TurnOn();
-
-                        // 駒の位置変更
-                        Vector3 pos = col.transform.position;
-                        pos.y = PiecePositionY;
-                        m_Target.transform.position = pos;
-                        pos.y = 0.051f;
-                        m_Reticule.position = pos;
-
-                        m_SquareCollider = col;
+                        SelectSquare(square.Index);
                     }
                 }
 
-                //if (IPlayer~~.checkCanMoveTo~~())
-                //{
 
-                //    IPlayer~~.clear
-                //}
-
-                if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
+                if (Input.GetMouseButtonDown(0)) // 人間依存
                 {
-                    m_SquareCollider.GetComponent<Square>().TurnOff();
-                    m_SquareCollider = null;
-
                     m_Phase = Phase.ButtonUpWait;
 
                     m_PieceCamera.Follow = m_Target.transform;
@@ -316,7 +322,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 break;
         }
     }
-
 
     /// <summary>
     /// Joycon操作

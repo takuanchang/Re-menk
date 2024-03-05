@@ -82,3 +82,9 @@ crashlytics-build.properties
 /[Aa]ssets/JoyconLib_scripts.meta
 /[Aa]ssets/Scenes/Scene1.unity
 /[Aa]ssets/Scenes/Scene1.unity.meta
+
+#JoyconLib
+/[Aa]ssets/Scenes/jikken.unity
+/[Aa]ssets/Scenes/jikken.unity.meta
+/[Aa]ssets/Scripts/jikken.cs
+/[Aa]ssets/Scripts/jikken.cs.meta

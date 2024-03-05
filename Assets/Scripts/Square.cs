@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    private Material m_material;
-
     private float m_HitPoint;
     private const float initialHP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
 
@@ -14,13 +12,10 @@ public class Square : MonoBehaviour
 
     private Board m_Owner = null;
     private int m_Index = -1;
+    public int Index => m_Index;
 
     public void Initialize(Board owner, int index)
     {
-        m_material = GetComponent<Renderer>().material;
-        m_material.EnableKeyword("_EMISSION");
-        m_material.EnableKeyword("_EmissionColor");
-
         m_HitPoint = initialHP;
 
         m_Owner = owner;
@@ -34,16 +29,6 @@ public class Square : MonoBehaviour
         //ToDo
     }
     */
-
-    // TODO:要調整
-    public void TurnOn()
-    {
-        m_material.SetColor("_EmissionColor", Color.red);
-    }
-    public void TurnOff()
-    {
-        m_material.SetColor("_EmissionColor", Color.black);
-    }
 
     // マスがダメージを貰う処理
     public void OnExploded(float distance, float speed)

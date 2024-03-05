@@ -60,7 +60,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, joycons.Count > 0 ? joycons[i % joycons.Count] : null); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, board, joycons.Count > 0 ? joycons[i % joycons.Count] : null); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -98,8 +98,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, null); // 3人以上の時Team等要修正
-            computerPlayer.RegisterBoard(board);
+            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, board, null); // 3人以上の時Team等要修正
             players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);

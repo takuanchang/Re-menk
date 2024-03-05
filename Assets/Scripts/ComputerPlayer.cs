@@ -89,18 +89,14 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         return Vector3.zero; // とりあえずズレなし
     }
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Joycon joycon)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, Board board, Joycon _)
     {
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+        m_Board = board;
 
         m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
-    }
-
-    public void RegisterBoard(Board board)
-    {
-        m_Board = board;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
