@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public interface IPlayer
 {
@@ -30,4 +31,6 @@ public interface IPlayer
     public bool PrepareNextPiece();
 
     public string CurrentPhaseString();
+
+    public UniTaskVoid LookUpSky();
 }

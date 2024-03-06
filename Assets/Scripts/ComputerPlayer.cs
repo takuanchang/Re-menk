@@ -128,6 +128,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         // 駒を用意する
         m_Target = m_PiecesManager.CreatePiece(Team);
+        m_Target.Thrower = this;
 
         RemainingPieces--;
 
@@ -208,6 +209,16 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_Target = null;
         IsPlayable = false;
         return;
+    }
+
+    public async UniTaskVoid LookUpSky()
+    {
+        Transform board = m_FreeLookCamera.LookAt;
+        m_FreeLookCamera.LookAt = transform;
+
+        await UniTask.Delay(1000);
+
+        m_FreeLookCamera.LookAt = board;
     }
 
     // ------------------------------------------------------------------------------------------
