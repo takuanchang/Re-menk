@@ -15,7 +15,7 @@ public class TurnManager : MonoBehaviour
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
     private static readonly float MaxWait = 4.0f; // TODO:上投げの閾値などを考えるときにも要チェック
-    private static readonly float Span = 1.0f;
+    private static readonly float CheckSpan = 1.0f;
 
     private List<IPlayer> m_Players;
 
@@ -146,14 +146,14 @@ public class TurnManager : MonoBehaviour
         // 全ピースが止まるか待機時間がMaxWaitを超えると抜け出す
         while (!m_PiecesManager.IsStableAll() && time < MaxWait)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken:token);
-            time += Span;
+            await UniTask.Delay(TimeSpan.FromSeconds(CheckSpan), cancellationToken:token);
+            time += CheckSpan;
         }
         if(time >= MaxWait)
         {
             // TODO: 止めても揺れはおさまらない為コライダーの変更か位置移動(滑り)必須？
             m_PiecesManager.StopPiecesMove();
-            await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(CheckSpan), cancellationToken: token);
         }
         PlayerChange();
         // m_isWaiting = false;

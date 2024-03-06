@@ -1,6 +1,9 @@
+using Cysharp.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -10,6 +13,8 @@ using UnityEngine.Events;
 [Serializable]
 public class HumanPlayer : MonoBehaviour , IPlayer
 {
+    private static readonly float RepeatInterval = 1.0f;
+
     /// <summary>
     /// このプレイヤーのチーム
     /// </summary>
@@ -85,6 +90,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// joycon情報、nullの場合はマウス操作
     /// </summary>
     Joycon m_Joycon = null;
+
+    private CancellationTokenSource m_CancellationTokenSource = null;
+
 
     readonly struct MouseLog {
         public readonly float deltaTime;
@@ -218,6 +226,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     private void SelectSquare(int squareNewIndex)
     {
+        // あった場合に初期化に不都合
         //if (squareNewIndex == m_SelectingIndex)
         //{
         //    return;
@@ -324,6 +333,46 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     }
 
     /// <summary>
+    /// Stickの入力を-1,0,1に離散化
+    /// </summary>
+    public Vector2Int DigitizeStickInput(Vector2 inputDirection)
+    {
+        Vector2Int direction = new Vector2Int();
+        inputDirection.Normalize();
+        // 右:1, 左:-1
+        if (inputDirection.x >= 0.5f)
+        {
+            direction.x = 1;
+        }
+        else if (inputDirection.x > -0.5f)
+        {
+            direction.x = 0;
+        }
+        else
+        {
+            direction.x = -1;
+        }
+
+        // 上:1, 下:-1
+        if (inputDirection.y >= 0.5f)
+        {
+            direction.y = 1;
+        }
+        else if (inputDirection.y > -0.5f)
+        {
+            direction.y = 0;
+        }
+        else
+        {
+            direction.y = -1;
+        }
+        return direction;
+    }
+
+    bool m_IsInputRepeatable = true;
+    Vector2Int m_PreviousStickInput = new Vector2Int(-2, -2);
+
+    /// <summary>
     /// Joycon操作
     /// </summary>
     private void PlayByJoycon()
@@ -332,62 +381,63 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         {
             // マス選択フェーズ
             case Phase.SquareSelect:
-                // マウスからレイを飛ばす
-
-                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // TODO:変更の必要あり
-                if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
+                var stickInput = DigitizeStickInput(m_Joycon.GetStick());
+                Debug.Log(stickInput);
+                if(m_PreviousStickInput != stickInput)
                 {
-                    var col = hit.collider;
-                    if (col != m_SquareCollider)
+                    if (m_CancellationTokenSource != null)
                     {
-                        //// 非選択マスを光らせなくする
-                        //if (m_SquareCollider != null)
-                        //{
-                        //    m_SquareCollider.GetComponent<Square>().TurnOff();
-                        //}
-                        //// 選択マスを光らせる
-                        //col.GetComponent<Square>().TurnOn();
-
-                        // 駒の位置変更
-                        Vector3 pos = col.transform.position;
-                        pos.y = PiecePositionY;
-                        m_Target.transform.position = pos;
-                        pos.y = 0.051f;
-                        m_Reticule.position = pos;
-
-                        m_SquareCollider = col;
+                        m_CancellationTokenSource.Cancel();
+                        m_CancellationTokenSource.Dispose();
+                        m_CancellationTokenSource = null;
+                    }
+                    m_IsInputRepeatable = true;
+                }
+                else
+                {
+                    if(m_IsInputRepeatable == false)
+                    {
+                        return;
                     }
                 }
 
-                //if (IPlayer~~.checkCanMoveTo~~())
-                //{
-
-                //    IPlayer~~.clear
-                //}
-
-                if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
+                m_PreviousStickInput = stickInput;
+                int nextSquareIndex = m_Board.GetNextSquareIndex(m_SelectingIndex.Value, stickInput);
+                if(nextSquareIndex != m_SelectingIndex.Value)
                 {
-                    m_SquareCollider.GetComponent<Square>().TurnOff();
-                    m_SquareCollider = null;
+                    SelectSquare(nextSquareIndex);
+                    m_CancellationTokenSource = new CancellationTokenSource();
+                    _ = RepeatInputInterval(m_CancellationTokenSource.Token);
+                }
 
+                if (m_Joycon.GetButtonDown(Joycon.Button.SHOULDER_1))
+                {
                     m_Phase = Phase.ButtonUpWait;
 
                     m_PieceCamera.Follow = m_Target.transform;
                     m_PieceCamera.LookAt = m_Target.transform;
                     m_PieceCamera.Priority = UsingPriority;
+
+                    m_IsInputRepeatable = true;
+                    if (m_CancellationTokenSource != null)
+                    {
+                        m_CancellationTokenSource.Cancel();
+                        m_CancellationTokenSource.Dispose();
+                        m_CancellationTokenSource = null;
+                    }
                 }
 
                 break;
             // 人間：マウス押し直し待ち
             // CPU : カメラ移動待ち
             case Phase.ButtonUpWait: // フェーズの名前が人間依存なので変えたほうがgood
-                if (Input.GetMouseButtonDown(1))
+                if (m_Joycon.GetButtonDown(Joycon.Button.DPAD_DOWN))
                 {
                     m_Phase = Phase.SquareSelect;
                     m_PieceCamera.Priority = NonUsingPriority;
                     break;
                 }
-                if (Input.GetMouseButtonDown(0))
+                if (m_Joycon.GetButtonDown(Joycon.Button.SHOULDER_1))
                 {
                     sumTime = 0.0f;
                     m_MouseHistory.Clear();
@@ -398,7 +448,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 break;
             // 投げるフェーズ
             case Phase.PieceThrow:
-                if (Input.GetMouseButtonDown(1))
+                if (m_Joycon.GetButtonDown(Joycon.Button.DPAD_DOWN))
                 {
                     m_Phase = Phase.SquareSelect;
                     m_PieceCamera.Priority = NonUsingPriority;
@@ -434,6 +484,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                 break;
         }
+    }
+
+    private async UniTaskVoid RepeatInputInterval(CancellationToken token)
+    {
+        m_IsInputRepeatable = false;
+        await UniTask.Delay(TimeSpan.FromSeconds(RepeatInterval), cancellationToken:token);
+        m_IsInputRepeatable = true;
     }
 
     void Update()

@@ -52,38 +52,8 @@ public class Board : MonoBehaviour
         return m_Length / 2 * m_Length + m_Length / 2;
     }
 
-    public int GetNextSquareIndex(int currentIndex, Vector2 inputDirection)
+    public int GetNextSquareIndex(int currentIndex, Vector2Int direction)
     {
-        Vector2Int direction = new Vector2Int();
-        inputDirection.Normalize();
-        // 右:1, 左:-1
-        if (inputDirection.x >= 0.5f)
-        {
-            direction.x = 1;
-        }
-        else if (inputDirection.x > -0.5f)
-        {
-            direction.x = 0;
-        }
-        else
-        {
-            direction.x = -1;
-        }
-
-        // 上:1, 下:-1
-        if (inputDirection.y >= 0.5f)
-        {
-            direction.y = 1;
-        }
-        else if (inputDirection.x > -0.5f)
-        {
-            direction.y = 0;
-        }
-        else
-        {
-            direction.y = -1;
-        }
-
         var nextRow = Mathf.Clamp(currentIndex % m_Length + direction.x, 0, m_Length - 1);
         var nextColumn = Mathf.Clamp(currentIndex / m_Length + direction.y, 0, m_Length - 1);
 
