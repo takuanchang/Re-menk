@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Events;
+using Cysharp.Threading.Tasks;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Piece : MonoBehaviour
@@ -10,7 +12,20 @@ public class Piece : MonoBehaviour
     private PiecesManager m_PiecesManager = null;
 
     private bool m_isDead = false;
+    private bool m_WillBeKilled = false;
     private Rigidbody rb;
+
+    private IPlayer m_Thrower;
+
+    public IPlayer Thrower
+    {
+        get => m_Thrower;
+
+        set
+        {
+            m_Thrower = value;
+        }
+    }
 
     [SerializeField]
     private float m_explosionParam = 2.0f;
@@ -34,6 +49,8 @@ public class Piece : MonoBehaviour
     [SerializeField]
     private ParticleSystem m_ExplosionEffect;
 
+    private GameObject m_Kiraan;
+
 
     /// <summary>
     /// 爆発時インパルスで追加する上方向ベクトル
@@ -41,9 +58,14 @@ public class Piece : MonoBehaviour
     private static readonly float AddedYOnExploded = 5.0f;
 
     /// <summary>
-    /// 駒を利用不可にする高さ
+    /// 駒を利用不可にする高さ(床)
     /// </summary>
     private static readonly float YMinLimit = -10;
+
+    /// <summary>
+    ///  駒を利用不可にする高さ(天井)
+    /// </summary>
+    private static readonly float YMaxLimit = 5;
 
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
@@ -88,6 +110,11 @@ public class Piece : MonoBehaviour
 
         m_ExplosionEffect.Stop();
         m_ExplosionEffect.Clear();
+
+        m_Kiraan = GameObject.Find("Kiraan");
+        m_Kiraan.GetComponent<MeshRenderer>().enabled = false;
+
+        Debug.Log(m_Kiraan);
 
         // フラグを切る
         m_isDead = false;
@@ -195,9 +222,19 @@ public class Piece : MonoBehaviour
         return rb.IsSleeping() || m_isDead;
     }
 
-    private bool ShouldBeDisabled()
+    private bool IsUnderGround()
     {
         return transform.position.y < YMinLimit;
+    }
+
+    private bool IsUpperCeil()
+    {
+        return transform.position.y > YMaxLimit;
+    }
+
+    private bool ShouldBeDisabled()
+    {
+        return IsUnderGround() || IsUpperCeil();
     }
 
     // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
@@ -209,11 +246,41 @@ public class Piece : MonoBehaviour
     }
 
     // 削除用プログラムを雑に導入
-    private void Update()
+    private async void Update()
     {
         if(ShouldBeDisabled())
         {
-            Kill();
+            if (IsUpperCeil() && !m_WillBeKilled)
+            {
+                // TODO: カメラを上に向けてキラーン✨
+                // Throwerにメッセージを送ってカメラを操作してもらう？
+                // FreeLookCameraのLookAtを消滅したポイントに変更する
+                // なんか色々おかしいので周辺の処理を考え直す
+                m_WillBeKilled = true;
+
+                // 指定の速度で上に飛ばす
+                rb.useGravity = false;
+                rb.velocity = Vector3.zero;
+                rb.AddForce(new Vector3(0, 20.0f, 0), ForceMode.Impulse);
+
+                Thrower.LookUpSky(); // ParticleEffectのtransformって使えたっけ？
+                await UniTask.Delay(1000);
+                Debug.Log(m_Kiraan);
+                m_Kiraan.GetComponent<MeshRenderer>().enabled = true;
+                m_Kiraan.GetComponent<Transform>().position = transform.position;
+                m_Kiraan.GetComponent<Animator>().Play("KiraanAnime", 0, 0.0f);
+                this.GetComponent<MeshRenderer>().enabled = false;
+                // m_Kiraan.GetComponent<Transform>().rotation = Quaternion.Euler(0, 0, 0);
+                await UniTask.Delay(1000);
+                m_Kiraan.GetComponent<MeshRenderer>().enabled = false;
+
+                Kill();
+            }
+            else if(!m_WillBeKilled)
+            {
+                m_WillBeKilled = true;
+                Kill();
+            }
         }
     }
 

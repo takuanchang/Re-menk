@@ -35,16 +35,6 @@ public class Square : MonoBehaviour
     }
     */
 
-    // TODO:要調整
-    public void TurnOn()
-    {
-        m_material.SetColor("_EmissionColor", Color.red);
-    }
-    public void TurnOff()
-    {
-        m_material.SetColor("_EmissionColor", Color.black);
-    }
-
     // マスがダメージを貰う処理
     public void OnExploded(float distance, float speed)
     {

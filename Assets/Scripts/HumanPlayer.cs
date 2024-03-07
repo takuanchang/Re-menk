@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using Cysharp.Threading.Tasks;
 
 // 人間側の実装とする
 
@@ -42,6 +43,10 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
     [SerializeField] private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+    private Cinemachine.CinemachineVirtualCamera m_KiraanCamera;
+    private Transform m_Sky;
+
+
     [SerializeField] private float rayLength = 20.0f;
 
     private Transform m_Reticule;
@@ -104,6 +109,11 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         m_PiecesManager = piecesManager;
 
         m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
+        m_KiraanCamera = GameObject.Find("KiraanCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>();
+
+        m_Sky = GameObject.Find("Sky").GetComponent<Transform>();
+        m_KiraanCamera.LookAt = m_Sky;
+        m_KiraanCamera.Priority = 5;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
@@ -128,6 +138,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         // 駒を用意する
         m_Target = m_PiecesManager.CreatePiece(Team);
+        m_PieceCamera.Follow = m_Target.transform;
+        m_PieceCamera.LookAt = m_Target.transform;
+        m_Target.Thrower = this;
         RemainingPieces--;
 
         // 操作可能にする
@@ -217,14 +230,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                     var col = hit.collider;
                     if(col!= m_SquareCollider)
                     {
-                        //// 非選択マスを光らせなくする
-                        //if (m_SquareCollider != null)
-                        //{
-                        //    m_SquareCollider.GetComponent<Square>().TurnOff();
-                        //}
-                        //// 選択マスを光らせる
-                        //col.GetComponent<Square>().TurnOn();
-
                         // 駒の位置変更
                         Vector3 pos = col.transform.position;
                         pos.y = PiecePositionY;
@@ -244,13 +249,10 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                 if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
                 {
-                    m_SquareCollider.GetComponent<Square>().TurnOff();
                     m_SquareCollider = null;
 
                     m_Phase = Phase.ButtonUpWait;
 
-                    m_PieceCamera.Follow = m_Target.transform;
-                    m_PieceCamera.LookAt = m_Target.transform;
                     m_PieceCamera.Priority = UsingPriority;
                     if(Team == Team.White)
                     {
@@ -316,5 +318,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                 break;
         }
+    }
+
+    public async UniTaskVoid LookUpSky()
+    {
+        m_KiraanCamera.Priority = 15;
+        await UniTask.Delay(2000);
+        m_KiraanCamera.Priority = 5;
+        Debug.Log(m_KiraanCamera.LookAt);
     }
 }

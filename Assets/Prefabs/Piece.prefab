@@ -5068,6 +5068,7 @@ MonoBehaviour:
   m_explosionParam: 5
   m_SpeedEffect: {fileID: 7624412220700007991}
   m_ExplosionEffect: {fileID: 6514403440678781349}
+  m_KiraanEffect: {fileID: 3118485172118681324, guid: da7f48598abd8644ca340d6a14003d7d, type: 3}
 --- !u!1 &4363876960749596532
 GameObject:
   m_ObjectHideFlags: 0
