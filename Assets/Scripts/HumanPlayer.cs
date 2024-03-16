@@ -69,7 +69,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     static readonly float threshold = 0.1f;
 
     // パラメータ群
-    [SerializeField] private float directionParam = 3.0f;
+    [SerializeField] private float directionParam = 1.0f;
     [SerializeField] private float speedParam = 1.0f;
 
     /// <summary>
@@ -382,7 +382,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
             // マス選択フェーズ
             case Phase.SquareSelect:
                 var stickInput = DigitizeStickInput(m_Joycon.GetStick());
-                Debug.Log(stickInput);
                 if(m_PreviousStickInput != stickInput)
                 {
                     if (m_CancellationTokenSource != null)
@@ -439,9 +438,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
                 if (m_Joycon.GetButtonDown(Joycon.Button.SHOULDER_1))
                 {
-                    sumTime = 0.0f;
-                    m_MouseHistory.Clear();
-                    targetPosition = Input.mousePosition;
+                    m_Joycon.Recenter();
                     m_Phase = Phase.PieceThrow;
                     m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
                 }
@@ -457,23 +454,14 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
 
                 // 人間はこんな感じ
-                float dt = Time.deltaTime;
-                sumTime += dt;
-                var mousePos = Input.mousePosition;
-                m_MouseHistory.Enqueue(new(dt, mousePos));
-                while (sumTime - m_MouseHistory.Peek().deltaTime > threshold)
-                {
-                    var (deltaTime, _) = m_MouseHistory.Dequeue();
-                    sumTime -= deltaTime;
-                }
-                if (Input.GetMouseButtonUp(0))
+                if (m_Joycon.GetButtonUp(Joycon.Button.SHOULDER_1))
                 {
                     m_PieceCamera.Priority = NonUsingPriority;
                     m_FreeLookCamera.Priority = UsingPriority;
                     m_ReticuleControler.ChangeAnimation(GameState.Threw);
-                    var dir = CalcurateDirection(mousePos);
-                    dir.y = CalculateSpeed(m_MouseHistory);
-                    Throw(dir);
+
+
+                    Throw(Vector3.zero);
                     m_TurnManager.SendMessage("OnPieceThrown");
                 }
 
