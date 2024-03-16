@@ -15,7 +15,7 @@ public class TurnManager : MonoBehaviour
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
     private static readonly float MaxWait = 2.0f;
-    private static readonly float Span = 1.0f;
+    private static readonly float Span = 0.5f;
 
     private List<IPlayer> m_Players;
 
@@ -155,6 +155,7 @@ public class TurnManager : MonoBehaviour
             m_PiecesManager.StopPiecesMove();
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
+
         PlayerChange();
         // m_isWaiting = false;
     }
