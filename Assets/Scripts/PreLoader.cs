@@ -28,7 +28,7 @@ public class PreLoader : MonoBehaviour
     private async UniTaskVoid TransitionScene()
     {
         await SceneManager.LoadSceneAsync("Title", LoadSceneMode.Additive);
-        await UniTask.Delay(1000);
+        // await UniTask.Delay(1000);
         m_LoadingTextObjeck.SetActive(false);
         while (m_Image.fillAmount >= epsilon)
         {
@@ -36,7 +36,7 @@ public class PreLoader : MonoBehaviour
             m_Image.fillAmount -= a;
         }
         m_Image.fillAmount = 0;
-
+        await SceneManager.UnloadSceneAsync("PreLoad");
     }
 
 }
