@@ -248,7 +248,7 @@ public class Piece : MonoBehaviour
     // 削除用プログラムを雑に導入
     private async void Update()
     {
-        if(ShouldBeDisabled())
+        if (ShouldBeDisabled())
         {
             if (IsUpperCeil() && !m_WillBeKilled)
             {

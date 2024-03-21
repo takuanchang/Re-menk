@@ -12,6 +12,8 @@ public class TurnManager : MonoBehaviour
 {
     private int m_currentPlayer = 0;
 
+    private bool m_IsBrokenAllSquare = false;
+
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
     private static readonly float MaxWait = 2.0f;
@@ -60,6 +62,13 @@ public class TurnManager : MonoBehaviour
 
     void PlayerChange()
     {
+        // 全マス破壊されている場合
+        if ( m_IsBrokenAllSquare)
+        {
+            GoToResult();
+            return;
+        }
+
         CurrentPlayer = (CurrentPlayer + 1) % m_Players.Count; // プレイヤーの入れ替え
         if (m_Players[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
@@ -78,21 +87,38 @@ public class TurnManager : MonoBehaviour
         m_ResultUI.SetActive(true);
 
         //(int white, int black) count = m_FrontBackCounter.CountFrontBack();
-        var (white, black) = m_FrontBackCounter.CountFrontBack();
-
-
         string result = "";
-        if(white < black)
+
+        // 全マス破壊時
+        if (m_IsBrokenAllSquare)
         {
-            result = "Black Win!";
-        }
-        else if(black < white)
-        {
-            result = "White Win!";
+            // 最後に破壊した人が負け
+            if (m_Players[CurrentPlayer].Team == Team.White)
+            {
+                result = "Black Win!";
+            }
+            else
+            {
+                result = "White Win!";
+            }
         }
         else
         {
-            result = "Draw";
+            var (white, black) = m_FrontBackCounter.CountFrontBack();
+
+
+            if (white < black)
+            {
+                result = "Black Win!";
+            }
+            else if (black < white)
+            {
+                result = "White Win!";
+            }
+            else
+            {
+                result = "Draw";
+            }
         }
         m_ResultText.text = result;
     }
@@ -155,7 +181,10 @@ public class TurnManager : MonoBehaviour
             m_PiecesManager.StopPiecesMove();
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
-
+        if(m_Board.ValidIndices.Count == 0)
+        {
+            m_IsBrokenAllSquare = true;
+        }
         PlayerChange();
         // m_isWaiting = false;
     }
