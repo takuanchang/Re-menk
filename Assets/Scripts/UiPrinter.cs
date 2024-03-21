@@ -28,7 +28,7 @@ public class UiPrinter : MonoBehaviour
         for (int i = 0; i < m_Players.Count; i++)
         {
             string phase = (m_Players[i].IsPlayable ? m_Players[i].CurrentPhaseString() : "Not Playable");
-            m_PhaseText.text += $"Player{i + 1} : {phase}";
+            m_PhaseText.text += $"Player{i + 1} : {phase}, 残り : {m_Players[i].RemainingPieces}";
             if (i != m_Players.Count - 1) m_PhaseText.text += '\n';
         }
     }
