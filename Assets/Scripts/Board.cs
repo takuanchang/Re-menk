@@ -25,6 +25,10 @@ public class Board : MonoBehaviour
     private List<int> m_ValidIndices = null;
     public IReadOnlyList<int> ValidIndices => m_ValidIndices;
 
+    private bool m_IsBrokenAll = false;
+    public bool IsBrokenAll => m_IsBrokenAll;
+
+
     public void InitializeBoard()
     {
         int count = m_Length * m_Length;
@@ -52,7 +56,10 @@ public class Board : MonoBehaviour
         m_BrokenEffects[squareIndex].Play();
         m_Squares[squareIndex].gameObject.SetActive(false);
         m_ValidIndices.Remove(squareIndex);
-        //TODO:全破壊された場合の処理
+        if (m_ValidIndices.Count == 0)
+        {
+            m_IsBrokenAll = true;
+        }
     }
 
     public Vector3 GetSquarePosition(int squareIndex)

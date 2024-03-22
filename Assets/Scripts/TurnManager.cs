@@ -12,8 +12,6 @@ public class TurnManager : MonoBehaviour
 {
     private int m_currentPlayer = 0;
 
-    private bool m_IsBrokenAllSquare = false;
-
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
     private static readonly float MaxWait = 2.0f;
@@ -63,7 +61,7 @@ public class TurnManager : MonoBehaviour
     void PlayerChange()
     {
         // 全マス破壊されている場合
-        if ( m_IsBrokenAllSquare)
+        if (m_Board.IsBrokenAll)
         {
             GoToResult();
             return;
@@ -90,17 +88,22 @@ public class TurnManager : MonoBehaviour
         string result = "";
 
         // 全マス破壊時
-        if (m_IsBrokenAllSquare)
+        if (m_Board.IsBrokenAll)
         {
             // 最後に破壊した人が負け
-            if (m_Players[CurrentPlayer].Team == Team.White)
+            foreach (Team team in Enum.GetValues(typeof(Team)))
             {
-                result = "Black Win!";
+                if(team == Team.None || team == m_Players[CurrentPlayer].Team)
+                {
+                    continue;
+                }
+                else
+                {
+                    Debug.Log(team);
+                    result += $"{team} ";
+                }
             }
-            else
-            {
-                result = "White Win!";
-            }
+            result += "Win!";
         }
         else
         {
@@ -180,10 +183,6 @@ public class TurnManager : MonoBehaviour
             // TODO: 止めても揺れはおさまらない為コライダーの変更か位置移動(滑り)必須？
             m_PiecesManager.StopPiecesMove();
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
-        }
-        if(m_Board.ValidIndices.Count == 0)
-        {
-            m_IsBrokenAllSquare = true;
         }
         PlayerChange();
         // m_isWaiting = false;
