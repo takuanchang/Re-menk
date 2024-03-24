@@ -65,7 +65,7 @@ public class Piece : MonoBehaviour
     /// <summary>
     ///  駒を利用不可にする高さ(天井)
     /// </summary>
-    private static readonly float YMaxLimit = 5;
+    private static readonly float YMaxLimit = 30;
 
     /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
