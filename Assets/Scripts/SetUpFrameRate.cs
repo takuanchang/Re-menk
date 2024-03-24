@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class SetUpFrameRate : MonoBehaviour
 {
+    /// <summary>
+    /// 使用するフレームレート
+    /// </summary>
+    const int FrameRate = 120;
+
     private void Start()
     {
-        Application.targetFrameRate = 120;
+        Application.targetFrameRate = FrameRate;
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public interface IPlayer
 {
@@ -20,7 +21,8 @@ public interface IPlayer
     /// </summary>
     public int RemainingPieces { get; } // setは実装
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager);
+
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, int piecesNum);
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitingCamera, Cinemachine.CinemachineVirtualCamera pieceCamera);
 
@@ -30,4 +32,6 @@ public interface IPlayer
     public bool PrepareNextPiece();
 
     public string CurrentPhaseString();
+
+    public UniTaskVoid LookUpSky();
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using Cysharp.Threading.Tasks;
 
 // 人間側の実装とする
 
@@ -26,44 +27,64 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// このプレイヤーに残っている駒の数
     /// 但し操作中の駒はカウントされない
     /// </summary>
-    public int RemainingPieces { get; private set; } = 8;
+    [field:SerializeField]
+    public int RemainingPieces { get; private set; } = 2; // TODO:実際は32等に
 
     private int m_SquareLayerMask;
 
     private Piece m_Target;
+    // 選択中のマスのコライダー
+    private Collider m_SquareCollider = null;
 
     private PiecesManager m_PiecesManager;
 
-    [SerializeField]
-    private Camera m_MainCamera;
-
+    [SerializeField] private Camera m_MainCamera;
     // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
-    [SerializeField]
-    private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
-
+    [SerializeField] private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
     [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+    private Cinemachine.CinemachineVirtualCamera m_KiraanCamera;
+    private Transform m_Sky;
 
+
+    [SerializeField] private float rayLength = 20.0f;
+
+    private Transform m_Reticule;
+    private ReticuleControler m_ReticuleControler;
+
+    // フェーズ
     public enum Phase {
         SquareSelect,
         //MoveCamera,
         ButtonUpWait,
         PieceThrow
     }
-
     private Phase m_Phase = Phase.SquareSelect;
 
     private Vector3 targetPosition = Vector3.zero;
     private Queue<MouseLog> m_MouseHistory = new();
     private float sumTime = 0.0f;
-    // 閾値
+    // 速さ決定時の履歴保存秒数の閾値
     static readonly float threshold = 0.1f;
 
-    float directionParam = 3.0f;
+    // パラメータ群
+    [SerializeField] private float directionParam = 3.0f;
+    [SerializeField] private float speedParam = 1.0f;
 
-    [SerializeField]
-    private float speedParam = 1.0f;
+    /// <summary>
+    /// ピースの高さ
+    /// </summary>
+    private static readonly float PiecePositionY = 3.0f;
+
+    /// <summary>
+    /// 使用しているカメラの優先度
+    /// </summary>
+    private static readonly int UsingPriority = 11;
+    /// <summary>
+    /// 使用していないカメラの優先度
+    /// </summary>
+    private static readonly int NonUsingPriority = 9;
 
     readonly struct MouseLog {
         public readonly float deltaTime;
@@ -82,11 +103,19 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     // ------------------------------------------------------------------------------------------
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, int piecesNum)
     {
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+        RemainingPieces = piecesNum;
+
+        m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
+        m_KiraanCamera = GameObject.Find("KiraanCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>();
+
+        m_Sky = GameObject.Find("Sky").GetComponent<Transform>();
+        m_KiraanCamera.LookAt = m_Sky;
+        m_KiraanCamera.Priority = 5;
     }
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
@@ -111,6 +140,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         // 駒を用意する
         m_Target = m_PiecesManager.CreatePiece(Team);
+        m_PieceCamera.Follow = m_Target.transform;
+        m_PieceCamera.LookAt = m_Target.transform;
+        m_Target.Thrower = this;
         RemainingPieces--;
 
         // 操作可能にする
@@ -118,8 +150,12 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         m_Phase = Phase.SquareSelect;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = 9; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_FreeLookCamera.Priority = 8;
+        m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        m_FreeLookCamera.Priority = NonUsingPriority;
+
+        // レティクルのアニメーションを選択中のものに変更
+        Debug.Log("hoge");
+        m_ReticuleControler.ChangeAnimation(GameState.Selecting);
 
         return true;
     }
@@ -137,7 +173,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         gap /= MathF.Min(Screen.width, Screen.height);
         gap *= directionParam;
-        Debug.Log(gap);
+        // Debug.Log(gap);
         return gap;
     }
 
@@ -166,24 +202,15 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     void Start() {
         m_SquareLayerMask = LayerMask.GetMask("Square");
+        m_Reticule = GameObject.Find("Reticule").GetComponent<Transform>();
     }
 
     // チーム(自身のカメラ)に合わせて向きを調整
     public Vector3 RotateThrowingVector(Vector3 mouseDifference)
     {
-        float rot = m_MainCamera.transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
-        float x = MathF.Cos(rot) * mouseDifference.x + MathF.Sin(rot) * mouseDifference.y;
-        float y = -MathF.Sin(rot) * mouseDifference.x + MathF.Cos(rot) * mouseDifference.y;
-        float z = mouseDifference.z;
-        return new Vector3(x, y, z);
-    }
-
-    public Vector3 RotateThrowingVector2(Vector3 mouseDifference)
-    {
         var roty = m_MainCamera.transform.rotation.eulerAngles.y;
         var quat = Quaternion.AngleAxis(roty, Vector3.up);
-        var a = quat * mouseDifference;
-        return a;
+        return quat * mouseDifference;
     }
 
     void Update()
@@ -200,11 +227,20 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 // マウスからレイを飛ばす
 
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
-                if (Physics.Raycast(ray, out var hit, 10.0f, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
+                if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
-                    Vector3 pos = hit.collider.transform.position;
-                    pos.y = 3.0f;
-                    m_Target.transform.position = pos;
+                    var col = hit.collider;
+                    if(col!= m_SquareCollider)
+                    {
+                        // 駒の位置変更
+                        Vector3 pos = col.transform.position;
+                        pos.y = PiecePositionY;
+                        m_Target.transform.position = pos;
+                        pos.y = 0.051f;
+                        m_Reticule.position = pos;
+
+                        m_SquareCollider = col;
+                    }
                 }
 
                 //if (IPlayer~~.checkCanMoveTo~~())
@@ -213,13 +249,18 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 //    IPlayer~~.clear
                 //}
 
-                if (Input.GetMouseButtonDown(0)) // 人間依存
+                if (m_SquareCollider != null && Input.GetMouseButtonDown(0)) // 人間依存
                 {
+                    m_SquareCollider = null;
+
                     m_Phase = Phase.ButtonUpWait;
 
-                    m_PieceCamera.Follow = m_Target.transform;
-                    m_PieceCamera.LookAt = m_Target.transform;
-                    m_PieceCamera.Priority = 11;
+                    m_PieceCamera.Priority = UsingPriority;
+                    if(Team == Team.White)
+                    {
+                        var body = m_PieceCamera.GetCinemachineComponent<Cinemachine.CinemachineTransposer>();
+                        body.m_FollowOffset.z = 5;
+                    }
                 }
 
                 break;
@@ -229,7 +270,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = 9;
+                    m_PieceCamera.Priority = NonUsingPriority;
                     break;
                 }
                 if (Input.GetMouseButtonDown(0))
@@ -238,6 +279,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                     m_MouseHistory.Clear();
                     targetPosition = Input.mousePosition;
                     m_Phase = Phase.PieceThrow;
+                    m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
                 }
                 break;
             // 投げるフェーズ
@@ -245,7 +287,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = 9;
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Selecting);
                     break;
                 }
 
@@ -261,8 +304,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    m_PieceCamera.Priority = 9;
-                    m_FreeLookCamera.Priority = 11;
+                    m_PieceCamera.Priority = NonUsingPriority;
+                    m_FreeLookCamera.Priority = UsingPriority;
+                    m_ReticuleControler.ChangeAnimation(GameState.Threw);
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);
                     Throw(dir);
@@ -276,5 +320,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                 break;
         }
+    }
+
+    public async UniTaskVoid LookUpSky()
+    {
+        m_KiraanCamera.Priority = 15;
+        await UniTask.Delay(2000);
+        m_KiraanCamera.Priority = 5;
+        Debug.Log(m_KiraanCamera.LookAt);
     }
 }
