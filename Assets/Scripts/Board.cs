@@ -67,6 +67,16 @@ public class Board : MonoBehaviour
         return m_Squares[squareIndex].transform.position;
     }
 
+    public int GetRemainingSquaresNum()
+    {
+        return m_ValidIndices.Count;
+    }
+
+    public int GetBoardSize()
+    {
+        return m_Length * m_Length;
+    }
+
 #if UNITY_EDITOR
     [ContextMenu("ボードのマスを配置")]
     public void InitializeBoardInEditor()

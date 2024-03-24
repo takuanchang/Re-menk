@@ -11,6 +11,7 @@ using static HumanPlayer;
 public class TurnManager : MonoBehaviour
 {
     private int m_currentPlayer = 0;
+    private int m_TurnNum = 0;
 
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
@@ -41,6 +42,9 @@ public class TurnManager : MonoBehaviour
     private Board m_Board;
 
     private CancellationTokenSource m_CancellationTokenSource = null;
+
+    // (プレイヤーの固有番号, ターン数, ターン終了時の残りマス数)
+    private List<(int player, int turn, int remaining)> m_GameHistory;
 
     /// <summary>
     /// このプレイヤーからスタートする
@@ -85,6 +89,7 @@ public class TurnManager : MonoBehaviour
         m_ResultUI.SetActive(true);
 
         //(int white, int black) count = m_FrontBackCounter.CountFrontBack();
+
         string result = "";
 
         // 全マス破壊時
@@ -123,6 +128,13 @@ public class TurnManager : MonoBehaviour
                 result = "Draw";
             }
         }
+
+        //var pre_remaining = m_Board.GetBoardSize();
+        //foreach (var x in m_GameHistory) {
+        //    result += $"\nTurn {x.turn} Player{x.player} 破壊枚数 {pre_remaining - x.remaining}";
+        //    pre_remaining = x.remaining;
+        //}
+
         m_ResultText.text = result;
     }
 
@@ -159,6 +171,8 @@ public class TurnManager : MonoBehaviour
         // 仕方ないがUIプリンターにプレイヤー情報を入れる
         // TODO 実装時は表示しない(消す)
         uiPrinter.Initialize(m_Players);
+
+        m_GameHistory = new List<(int player, int turn, int remaining)>();
     }
 
     private async UniTaskVoid EndTurn()
@@ -184,6 +198,11 @@ public class TurnManager : MonoBehaviour
             m_PiecesManager.StopPiecesMove();
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
+
+        m_GameHistory.Add((CurrentPlayer, m_TurnNum, m_Board.GetRemainingSquaresNum()));
+        Debug.Log(m_GameHistory[m_GameHistory.Count - 1]);
+        m_TurnNum++;
+
         PlayerChange();
         // m_isWaiting = false;
     }
