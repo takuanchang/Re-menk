@@ -27,7 +27,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     /// このプレイヤーに残っている駒の数
     /// 但し操作中の駒はカウントされない
     /// </summary>
-    public int RemainingPieces { get; private set; } = 4; // TODO:実際は32等に
+    [field:SerializeField]
+    public int RemainingPieces { get; private set; } = 2; // TODO:実際は32等に
 
     private int m_SquareLayerMask;
 
@@ -102,11 +103,12 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
     // ------------------------------------------------------------------------------------------
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager)
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, int piecesNum)
     {
         Team = team;
         m_TurnManager = turnManager;
         m_PiecesManager = piecesManager;
+        RemainingPieces = piecesNum;
 
         m_ReticuleControler = GameObject.Find("Reticule").GetComponent<ReticuleControler>();
         m_KiraanCamera = GameObject.Find("KiraanCamera").GetComponent<Cinemachine.CinemachineVirtualCamera>();

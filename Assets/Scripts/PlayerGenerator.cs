@@ -39,6 +39,11 @@ public class PlayerGenerator : MonoBehaviour
     /// </summary>
     const int NonplayableFreeLookPriority = 11;
 
+    /// <summary>
+    /// 駒の総数
+    /// </summary>
+    const int AllPiecesNum = 64;
+
     public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum)
     {
 
@@ -50,6 +55,9 @@ public class PlayerGenerator : MonoBehaviour
         var playersNum = humanNum + cpuNum;
         List<IPlayer> players = new List<IPlayer>();
 
+        var individualPiecesNum = AllPiecesNum / playersNum;
+        var remainPiecesNum = AllPiecesNum % playersNum;
+
         int freeLookPriority = PlayableFreeLookPriority; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
                                                          // 誰から開始か、どのタイミングで決める？
 
@@ -58,7 +66,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -95,7 +103,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager); // 3人以上の時Team等要修正
+            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // 3人以上の時Team等要修正
             computerPlayer.RegisterBoard(board);
             players.Add(computerPlayer);
 

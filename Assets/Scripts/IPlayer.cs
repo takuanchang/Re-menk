@@ -21,7 +21,8 @@ public interface IPlayer
     /// </summary>
     public int RemainingPieces { get; } // setは実装
 
-    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager);
+
+    public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, int piecesNum);
 
     public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitingCamera, Cinemachine.CinemachineVirtualCamera pieceCamera);
 
