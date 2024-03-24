@@ -13,5 +13,5 @@ public enum Team
     /// <summary>
     /// 白チーム
     /// </summary>
-    White
+    White,
 }

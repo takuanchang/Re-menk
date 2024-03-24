@@ -16,7 +16,7 @@ public class TurnManager : MonoBehaviour
     // 現状このフラグを使う必要がなくなっている
     // private bool m_isWaiting = false;
     private static readonly float MaxWait = 2.0f;
-    private static readonly float Span = 1.0f;
+    private static readonly float Span = 0.5f;
 
     private List<IPlayer> m_Players;
 
@@ -64,6 +64,13 @@ public class TurnManager : MonoBehaviour
 
     void PlayerChange()
     {
+        // 全マス破壊されている場合
+        if (m_Board.IsBrokenAll)
+        {
+            GoToResult();
+            return;
+        }
+
         CurrentPlayer = (CurrentPlayer + 1) % m_Players.Count; // プレイヤーの入れ替え
         if (m_Players[CurrentPlayer].PrepareNextPiece()) // 次のプレイヤーに準備させる
         {
@@ -82,21 +89,44 @@ public class TurnManager : MonoBehaviour
         m_ResultUI.SetActive(true);
 
         //(int white, int black) count = m_FrontBackCounter.CountFrontBack();
-        var (white, black) = m_FrontBackCounter.CountFrontBack();
 
+        string result = "";
 
-        var result = "";
-        if(white < black)
+        // 全マス破壊時
+        if (m_Board.IsBrokenAll)
         {
-            result = "Black Win!";
-        }
-        else if(black < white)
-        {
-            result = "White Win!";
+            // 最後に破壊した人が負け
+            foreach (Team team in Enum.GetValues(typeof(Team)))
+            {
+                if(team == Team.None || team == m_Players[CurrentPlayer].Team)
+                {
+                    continue;
+                }
+                else
+                {
+                    Debug.Log(team);
+                    result += $"{team} ";
+                }
+            }
+            result += "Win!";
         }
         else
         {
-            result = "Draw";
+            var (white, black) = m_FrontBackCounter.CountFrontBack();
+
+
+            if (white < black)
+            {
+                result = "Black Win!";
+            }
+            else if (black < white)
+            {
+                result = "White Win!";
+            }
+            else
+            {
+                result = "Draw";
+            }
         }
 
         //var pre_remaining = m_Board.GetBoardSize();

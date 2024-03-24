@@ -7,7 +7,7 @@ public class Square : MonoBehaviour
     private Material m_material;
 
     private float m_HitPoint;
-    private const float initialHP = 25.0f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
+    private const float initialHP = 0.1f; // TODO:体力の減り方がウィンドウの大きさで変わってしまう
 
     [SerializeField]
     private float m_explosionParam = 0.1f;

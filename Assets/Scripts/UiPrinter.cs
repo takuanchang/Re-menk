@@ -23,7 +23,7 @@ public class UiPrinter : MonoBehaviour
             return;
         }
 
-        m_TurnText.text = $"Player{m_TurnManager.CurrentPlayer + 1}";
+        m_TurnText.text = $"Player{m_TurnManager.CurrentPlayer + 1}が操作中";
         m_PhaseText.text = "";
         for (int i = 0; i < m_Players.Count; i++)
         {
