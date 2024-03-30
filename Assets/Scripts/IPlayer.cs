@@ -24,7 +24,7 @@ public interface IPlayer
 
     public void Initialize(Team team, GameObject turnManager, PiecesManager piecesManager, int piecesNum);
 
-    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitingCamera, Cinemachine.CinemachineVirtualCamera pieceCamera);
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase selectCamera, Cinemachine.CinemachineVirtualCameraBase waitingCamera, Cinemachine.CinemachineVirtualCamera pieceCamera);
 
     /// <summary>
     /// 次の駒を用意してから操作可能にする

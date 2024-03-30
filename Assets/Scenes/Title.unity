@@ -1571,6 +1571,7 @@ MonoBehaviour:
   m_HowToPlayPanel: {fileID: 515440349}
   m_SettingsPanel: {fileID: 346088393}
   m_SelectModePanel: {fileID: 937201991}
+  m_BlackPanel: {fileID: 0}
   m_HowToPages:
   - {fileID: 1027926042}
   - {fileID: 1273125768}

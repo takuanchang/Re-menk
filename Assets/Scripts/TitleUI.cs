@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
+using Cysharp.Threading.Tasks;
 
 public class TitleUI : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class TitleUI : MonoBehaviour
     {
         SceneManager.LoadScene(GameSceneName);
     }
+
 
     public void ExitGame()
     {
