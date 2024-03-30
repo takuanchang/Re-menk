@@ -12,21 +12,24 @@ public class WindowGraph : MonoBehaviour
     private Vector2 m_CircleRectSize = new Vector2(11, 11);
     private const float connectionWidth = 3.0f;
 
+    private Color[] colorList = { Color.white, Color.black, Color.red };
+
     private void Awake()
     {
         m_GraphContainer = transform.Find("GraphContainer").GetComponent<RectTransform>();
 
-        List<int> valueList = new List<int>() { 5, 98, 56, 45, 30, 22, 17, 15, 13, 17, 25, 37, 40, 36, 33 };
-        ShowGraph(valueList);
-        valueList = new List<int>() { 8, 8, 35, 87, 25, 83, 11, 24, 63, 83, 52, 64, 66, 46, 21 };
-        ShowGraph(valueList);
+        //List<int> valueList = new List<int>() { 5, 98, 56, 45, 30, 22, 17, 15, 13, 17, 25, 37, 40, 36, 33 };
+        //ShowGraph(valueList);
+        //valueList = new List<int>() { 8, 8, 35, 87, 25, 83, 11, 24, 63, 83, 52, 64, 66, 46, 21 };
+        //ShowGraph(valueList);
     }
 
-    private void CreateCircle(Vector2 anchoredPosition)
+    private void CreateCircle(Vector2 anchoredPosition, int color)
     {
         GameObject gameObject = new GameObject("circle", typeof(Image));
         gameObject.transform.SetParent(m_GraphContainer, false);
         gameObject.GetComponent<Image>().sprite = m_CircleSprite;
+        gameObject.GetComponent<Image>().color = colorList[color];
 
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         rectTransform.anchoredPosition = anchoredPosition;
@@ -35,35 +38,38 @@ public class WindowGraph : MonoBehaviour
         rectTransform.anchorMax = Vector2.zero;
     }
 
-    private void ShowGraph(List<int> valueList)
+    public void ShowGraph(List<int> valueList, int yMax, int mark)
     {
+        Debug.Log(valueList);
+
         float graphHeight = m_GraphContainer.sizeDelta.y;
+        float graphWidth = m_GraphContainer.sizeDelta.x;
 
         Vector2? lastCircleAnchoredPosition = null;
 
-        // óví≤êÆ
-        float yMaximum = 100f;
-        float xSize = 50f;
+        // Ë¶ÅË™øÊï¥
+        // float yMaximum = 64f;
+        float xMaximum = valueList.Count - 1;
 
         for (int i = 0; i < valueList.Count; i++)
         {
-            float xPosition = i * xSize;
-            float yPosition = (valueList[i] / yMaximum) * graphHeight;
+            float xPosition = ((float)i / (float)xMaximum) * graphWidth;
+            float yPosition = ((float)valueList[i] /  (float)yMax) * graphHeight;
             Vector2 anchoredPosition = new Vector2(xPosition, yPosition);
-            CreateCircle(anchoredPosition);
+            CreateCircle(anchoredPosition, mark);
             if (lastCircleAnchoredPosition != null)
             {
-                CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition);
+                CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, mark);
             }
             lastCircleAnchoredPosition = anchoredPosition;
         }
     }
 
-    private void CreateDotConnection(Vector2 dotPositionA, Vector2 dotPositionB)
+    private void CreateDotConnection(Vector2 dotPositionA, Vector2 dotPositionB, int color)
     {
         GameObject gameObject = new GameObject("dotConnection", typeof(Image));
         gameObject.transform.SetParent(m_GraphContainer, false);
-        gameObject.GetComponent<Image>().color = new Color(1, 1, 1, .5f);
+        gameObject.GetComponent<Image>().color = colorList[color];
 
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         Vector2 dir = (dotPositionB - dotPositionA).normalized;
