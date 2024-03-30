@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
+using UnityEngine.Purchasing;
 
 // 人間側の実装とする
 
@@ -42,8 +43,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
-    [SerializeField] private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
-    [SerializeField] private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
+    private Cinemachine.CinemachineVirtualCameraBase m_SelectCamera;
+    private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
+    private Cinemachine.CinemachineVirtualCamera m_PieceCamera;
     private Cinemachine.CinemachineVirtualCamera m_KiraanCamera;
     private Transform m_Sky;
 
@@ -118,11 +120,35 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         m_KiraanCamera.Priority = 5;
     }
 
-    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase select, Cinemachine.CinemachineVirtualCameraBase freeLook, Cinemachine.CinemachineVirtualCamera piece)
     {
         m_MainCamera = main;
+        m_SelectCamera = select;
         m_FreeLookCamera = freeLook;
         m_PieceCamera = piece;
+        ChangeCamerasPriority(UsingCamera.FreeLook);
+    }
+
+    private void ChangeCamerasPriority(UsingCamera usingCamera)
+    {
+        m_SelectCamera.Priority = NonUsingPriority;
+        m_FreeLookCamera.Priority = NonUsingPriority;
+        m_PieceCamera.Priority = NonUsingPriority;
+        switch (usingCamera)
+        {
+            case UsingCamera.Select:
+                m_SelectCamera.Priority = UsingPriority;
+                break;
+            case UsingCamera.FreeLook:
+                m_FreeLookCamera.Priority = UsingPriority;
+                break;
+            case UsingCamera.Piece:
+                m_PieceCamera.Priority = UsingPriority;
+                break;
+            default:
+                m_FreeLookCamera.Priority = UsingPriority;
+                break;
+        }
     }
 
     /// <summary>
@@ -150,8 +176,10 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         m_Phase = Phase.SquareSelect;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_FreeLookCamera.Priority = NonUsingPriority;
+        ChangeCamerasPriority(UsingCamera.Select);
+        //m_SelectCamera.Priority = UsingPriority;
+        //m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        //m_FreeLookCamera.Priority = NonUsingPriority;
 
         // レティクルのアニメーションを選択中のものに変更
         Debug.Log("hoge");
@@ -255,7 +283,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                     m_Phase = Phase.ButtonUpWait;
 
-                    m_PieceCamera.Priority = UsingPriority;
+                    //m_PieceCamera.Priority = UsingPriority;
+                    ChangeCamerasPriority(UsingCamera.Piece);
                     if(Team == Team.White)
                     {
                         var body = m_PieceCamera.GetCinemachineComponent<Cinemachine.CinemachineTransposer>();
@@ -270,7 +299,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = NonUsingPriority;
+                    //m_PieceCamera.Priority = NonUsingPriority;
+                    ChangeCamerasPriority(UsingCamera.Select);
                     break;
                 }
                 if (Input.GetMouseButtonDown(0))
@@ -287,7 +317,8 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 if (Input.GetMouseButtonDown(1))
                 {
                     m_Phase = Phase.SquareSelect;
-                    m_PieceCamera.Priority = NonUsingPriority;
+                    //m_PieceCamera.Priority = NonUsingPriority;
+                    ChangeCamerasPriority(UsingCamera.Piece);
                     m_ReticuleControler.ChangeAnimation(GameState.Selecting);
                     break;
                 }
@@ -304,8 +335,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
                 if (Input.GetMouseButtonUp(0))
                 {
-                    m_PieceCamera.Priority = NonUsingPriority;
-                    m_FreeLookCamera.Priority = UsingPriority;
+                    //m_PieceCamera.Priority = NonUsingPriority;
+                    //m_FreeLookCamera.Priority = UsingPriority;
+                    ChangeCamerasPriority(UsingCamera.FreeLook);
                     m_ReticuleControler.ChangeAnimation(GameState.Threw);
                     var dir = CalcurateDirection(mousePos);
                     dir.y = CalculateSpeed(m_MouseHistory);

@@ -27,6 +27,9 @@ public class TurnManager : MonoBehaviour
     private GameObject m_ResultUI;
 
     [SerializeField]
+    private GameObject m_ResulatDetailsUI;
+
+    [SerializeField]
     private Text m_ResultText;
 
     [SerializeField]
@@ -44,12 +47,14 @@ public class TurnManager : MonoBehaviour
     private CancellationTokenSource m_CancellationTokenSource = null;
 
     // (プレイヤーの固有番号, ターン数, ターン終了時の残りマス数)
-    private List<(int player, int turn, int remaining)> m_GameHistory;
+    private List<(int player, Team team, int turn, int remaining, (int, int) piecesNums)> m_GameHistory;
 
     /// <summary>
     /// このプレイヤーからスタートする
     /// </summary>
     const int StartPlayer = 0;
+
+    private List<int> piecesNums;
 
     public int CurrentPlayer
     {
@@ -162,6 +167,12 @@ public class TurnManager : MonoBehaviour
         int humanNum = setting.HumanNum;
         int cpuNum = setting.ComputerNum;
 
+        piecesNums = new List<int>(humanNum + cpuNum);
+        for (int i = 0; i < cpuNum + humanNum; i++)
+        {
+            piecesNums.Add(0);
+        }
+
         m_Board.InitializeBoard();
         m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
 
@@ -173,7 +184,12 @@ public class TurnManager : MonoBehaviour
         // TODO 実装時は表示しない(消す)
         uiPrinter.Initialize(m_Players);
 
-        m_GameHistory = new List<(int player, int turn, int remaining)>();
+        //List<int> zeroList = new List<int>(cpuNum + humanNum);
+        //for (int i = 0; i < cpuNum + humanNum; i++)
+        //{
+        //    zeroList.Add(0);
+        //}
+        m_GameHistory = new List<(int player, Team team, int turn, int remaining, (int, int))>();
     }
 
     private async UniTaskVoid EndTurn()
@@ -200,11 +216,16 @@ public class TurnManager : MonoBehaviour
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
 
-        m_GameHistory.Add((CurrentPlayer, m_TurnNum, m_Board.GetRemainingSquaresNum()));
+        m_GameHistory.Add((CurrentPlayer, m_Players[CurrentPlayer].Team, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.CountFrontBack()));
         Debug.Log(m_GameHistory[m_GameHistory.Count - 1]);
         m_TurnNum++;
 
         PlayerChange();
         // m_isWaiting = false;
+    }
+
+    public List<(int player, Team team, int turn, int remaining, (int, int) piecesNums)> GetGameHistory()
+    {
+        return m_GameHistory;
     }
 }

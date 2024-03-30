@@ -44,4 +44,28 @@ public class PiecesManager : MonoBehaviour
     {
         m_TurnManager.ResetEndTurn();
     }
+
+    // TODO : 重そうなので後で修正することを考える
+    public List<int> CountPiecesNums()
+    {
+        int listSize = System.Enum.GetNames(typeof(Team)).Length - 1; // Noneがあるので一つ減らす
+        List<int> piecesNums = new List<int>(listSize);
+        for (int i = 0; i < listSize; i++)
+        {
+            piecesNums.Add(0);
+        }
+
+        foreach(Piece piece in m_Pieces)
+        {
+            Team team = piece.Team;
+            if(team == Team.None)
+            {
+                continue;
+            }
+
+            piecesNums[((int)team)]++;
+        }
+
+        return piecesNums;
+    }
 }

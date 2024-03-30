@@ -43,6 +43,7 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
     // オンライン・NPC対戦の場合は待機中にFreeLookCameraを使う
     // オフライン対戦の場合はDollyCameraを使う
     // Cinemachine.CinemachineVirtualCameraBaseにどちらかを代入して使う
+    private Cinemachine.CinemachineVirtualCameraBase m_SelectCamera;
     [SerializeField]
     private Cinemachine.CinemachineVirtualCameraBase m_FreeLookCamera;
 
@@ -106,12 +107,36 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         m_Board = board;
     }
 
-    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
+    public void SetupCameras(Camera main, Cinemachine.CinemachineVirtualCameraBase selectCamera, Cinemachine.CinemachineVirtualCameraBase waitTimeCamera, Cinemachine.CinemachineVirtualCamera piece)
     {
         m_MainCamera = main;
+        m_SelectCamera = selectCamera;
         m_WaitTimeCamera = waitTimeCamera;
         //m_FreeLookCamera = waitTimeCamera;
         m_PieceCamera = piece;
+        ChangeCamerasPriority(UsingCamera.Wait);
+    }
+
+    private void ChangeCamerasPriority(UsingCamera usingCamera)
+    {
+        m_SelectCamera.Priority = NonUsingPriority;
+        m_PieceCamera.Priority = NonUsingPriority;
+        m_WaitTimeCamera.Priority = NonUsingPriority;
+        switch (usingCamera)
+        {
+            case UsingCamera.Select:
+                m_SelectCamera.Priority = UsingPriority;
+                break;
+            case UsingCamera.Piece:
+                m_PieceCamera.Priority = UsingPriority;
+                break;
+            case UsingCamera.Wait:
+                m_WaitTimeCamera.Priority = UsingPriority;
+                break;
+            default:
+                m_WaitTimeCamera.Priority = UsingPriority;
+                break;
+        }
     }
 
     /// <summary>
@@ -137,8 +162,9 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         IsPlayable = true;
 
         // カメラを俯瞰視点にする
-        m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        m_WaitTimeCamera.Priority = NonUsingPriority;
+        ChangeCamerasPriority(UsingCamera.Select);
+        //m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
+        // m_WaitTimeCamera.Priority = NonUsingPriority;
 
         _ = ExecuteTurn();
 
@@ -166,7 +192,8 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         m_PieceCamera.Follow = m_Target.transform;
         m_PieceCamera.LookAt = m_Target.transform;
-        m_PieceCamera.Priority = UsingPriority;
+        //m_PieceCamera.Priority = UsingPriority;
+        ChangeCamerasPriority(UsingCamera.Piece);
         if (Team == Team.White)
         {
             var body = m_PieceCamera.GetCinemachineComponent<Cinemachine.CinemachineTransposer>();
@@ -184,8 +211,9 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // すぐ投げられるとびっくりするので待つ
         m_ReticuleControler.ChangeAnimation(GameState.Threw);
 
-        m_PieceCamera.Priority = NonUsingPriority;
-        m_WaitTimeCamera.Priority = UsingPriority;
+        //m_PieceCamera.Priority = NonUsingPriority;
+        //m_WaitTimeCamera.Priority = UsingPriority;
+        ChangeCamerasPriority(UsingCamera.Wait);
 
         var dir = CalcurateDirection();
         dir.y = CalculateSpeed();

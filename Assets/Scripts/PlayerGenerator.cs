@@ -44,6 +44,11 @@ public class PlayerGenerator : MonoBehaviour
     /// </summary>
     const int AllPiecesNum = 64;
 
+    /// <summary>
+    /// チームの総数
+    /// </summary>
+    public int m_TeamNum { get; private set; } = 2;
+
     public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum)
     {
 
@@ -58,20 +63,33 @@ public class PlayerGenerator : MonoBehaviour
         var individualPiecesNum = AllPiecesNum / playersNum;
         var remainPiecesNum = AllPiecesNum % playersNum;
 
-        int freeLookPriority = PlayableFreeLookPriority; // この実装おかしい。現状は1番はじめに生成されたプレイヤーが遊ぶようになっている。
-                                                         // 誰から開始か、どのタイミングで決める？
+        int cameraRowNum = 1, cameraColumnNum = 1; // カメラの配置数
+        for(int i = 0; cameraColumnNum * cameraRowNum < playersNum; i++)
+        {
+            if (i % 2 == 0)
+            {
+                cameraRowNum++;
+            }
+            else
+            {
+                cameraColumnNum++;
+            }
+        }
+        // 各カメラ表示の幅と高さ
+        var width = 1f / cameraRowNum;
+        var height = 1f / cameraColumnNum;
 
         for (int i = 0; i < humanNum; i++)
         {
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % m_TeamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
             mainCamera.cullingMask |= (1 << (myLayer));
-            mainCamera.rect = new Rect(0.5f * (i % 2), 0.5f * (i / 2), 0.5f, (playersNum >= 3 ? 0.5f : 1.0f));
+            mainCamera.rect = new Rect(width * (i % cameraRowNum), height * (i / cameraRowNum), width, height);
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
@@ -83,7 +101,6 @@ public class PlayerGenerator : MonoBehaviour
             GameObject freeLook = Instantiate(m_FreeLookCameraPrefab);
             freeLook.layer = myLayer;
             Cinemachine.CinemachineVirtualCameraBase freeLookBase = freeLook.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
-            freeLookBase.Priority = freeLookPriority;
             freeLookBase.Follow = boardRoot;
             freeLookBase.LookAt = boardRoot;
 
@@ -92,9 +109,7 @@ public class PlayerGenerator : MonoBehaviour
             Cinemachine.CinemachineVirtualCamera pieceCameraBase = pieceCamera.GetComponent<Cinemachine.CinemachineVirtualCamera>();
             Assert.IsNotNull(pieceCameraBase);
 
-            humanPlayer.SetupCameras(mainCamera, freeLookBase, pieceCameraBase);
-
-            freeLookPriority = NonplayableFreeLookPriority;
+            humanPlayer.SetupCameras(mainCamera, selectCameraBase, freeLookBase, pieceCameraBase);
         }
 
         CinemachineSmoothPath cinemachineSmoothPath = GameObject.Find("DollyTrack").GetComponent<CinemachineSmoothPath>();
@@ -103,13 +118,13 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)(i % 2), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // 3人以上の時Team等要修正
+            computerPlayer.Initialize((Team)(i % m_TeamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // 3人以上の時Team等要修正
             computerPlayer.RegisterBoard(board);
             players.Add(computerPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
             mainCamera.cullingMask |= (1 << myLayer);
-            mainCamera.rect = new Rect(0.5f * (i % 2), 0.5f * (i / 2), 0.5f, (playersNum >= 3 ? 0.5f : 1.0f));
+            mainCamera.rect = new Rect(width * (i % cameraRowNum), height * (i / cameraRowNum), width, height);
 
             GameObject selectCamera = Instantiate(m_SelectCameraPrefab);
             selectCamera.layer = myLayer;
@@ -122,7 +137,6 @@ public class PlayerGenerator : MonoBehaviour
             DollyCamera.layer = myLayer;
             DollyCamera.GetComponent<CinemachineDollyCart>().m_Path = cinemachineSmoothPath;
             Cinemachine.CinemachineVirtualCameraBase DollyCameraBase = DollyCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
-            DollyCameraBase.Priority = freeLookPriority;
             DollyCameraBase.Follow = boardRoot;
             DollyCameraBase.LookAt = boardRoot;
 
@@ -130,7 +144,23 @@ public class PlayerGenerator : MonoBehaviour
             pieceCamera.layer = myLayer;
             Cinemachine.CinemachineVirtualCamera pieceCameraBase = pieceCamera.GetComponent<Cinemachine.CinemachineVirtualCamera>();
 
-            computerPlayer.SetupCameras(mainCamera, DollyCameraBase, pieceCameraBase);
+            computerPlayer.SetupCameras(mainCamera, selectCameraBase, DollyCameraBase, pieceCameraBase);
+        }
+
+        for (int i = playersNum; i < cameraRowNum * cameraColumnNum; i++)
+        {
+            var myLayer = LayerMask.NameToLayer("Excess");
+
+            Camera mainCamera = Instantiate(m_MainCameraPrefab);
+            mainCamera.cullingMask |= (1 << myLayer);
+            mainCamera.rect = new Rect(width * (i % cameraRowNum), height * (i / cameraRowNum), width, height);
+
+            GameObject DollyCamera = Instantiate(m_DollyCameraPrefab);
+            DollyCamera.layer = myLayer;
+            DollyCamera.GetComponent<CinemachineDollyCart>().m_Path = cinemachineSmoothPath;
+            Cinemachine.CinemachineVirtualCameraBase DollyCameraBase = DollyCamera.GetComponent<Cinemachine.CinemachineVirtualCameraBase>();
+            DollyCameraBase.Follow = boardRoot;
+            DollyCameraBase.LookAt = boardRoot;
         }
         return players;
     }
