@@ -6,6 +6,7 @@ public class SettingManager : MonoBehaviour
 {
     private int m_HumanNum;
     private int m_ComputerNum;
+    private int m_TeamNum = 2;
 
     public int HumanNum
     {
@@ -24,6 +25,16 @@ public class SettingManager : MonoBehaviour
         private set
         {
             m_ComputerNum = value;
+        }
+    }
+
+    public int TeamNum
+    {
+        get => m_TeamNum;
+
+        private set
+        {
+            m_TeamNum = value;
         }
     }
 

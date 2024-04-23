@@ -166,6 +166,7 @@ public class TurnManager : MonoBehaviour
         var setting = FindObjectOfType<SettingManager>();
         int humanNum = setting.HumanNum;
         int cpuNum = setting.ComputerNum;
+        int teamNum = setting.TeamNum;
 
         piecesNums = new List<int>(humanNum + cpuNum);
         for (int i = 0; i < cpuNum + humanNum; i++)
@@ -174,7 +175,7 @@ public class TurnManager : MonoBehaviour
         }
 
         m_Board.InitializeBoard();
-        m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
+        m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum, teamNum);
 
         // リバーシは黒が先行
         CurrentPlayer = StartPlayer;

@@ -47,9 +47,9 @@ public class PlayerGenerator : MonoBehaviour
     /// <summary>
     /// チームの総数
     /// </summary>
-    public int m_TeamNum { get; private set; } = 2;
+    //public int m_TeamNum { get; private set; } = 2;
 
-    public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum)
+    public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum, int teamNum)
     {
 
         var piecesManager = GameObject.Find(PiecesManager).GetComponent<PiecesManager>();
@@ -84,7 +84,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % m_TeamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % teamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
@@ -118,7 +118,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             ComputerPlayer computerPlayer = Instantiate(m_ComputerPrefab);
-            computerPlayer.Initialize((Team)(i % m_TeamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // 3人以上の時Team等要修正
+            computerPlayer.Initialize((Team)(i % teamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // 3人以上の時Team等要修正
             computerPlayer.RegisterBoard(board);
             players.Add(computerPlayer);
 
