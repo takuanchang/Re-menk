@@ -42,7 +42,7 @@ public class PlayerGenerator : MonoBehaviour
     /// <summary>
     /// 駒の総数
     /// </summary>
-    const int AllPiecesNum = 64;
+    const int AllPiecesNum = 4;
 
     /// <summary>
     /// チームの総数
@@ -150,7 +150,7 @@ public class PlayerGenerator : MonoBehaviour
         for (int i = playersNum; i < cameraRowNum * cameraColumnNum; i++)
         {
             var myLayer = LayerMask.NameToLayer("Excess");
-
+            Debug.Log(myLayer);
             Camera mainCamera = Instantiate(m_MainCameraPrefab);
             mainCamera.cullingMask |= (1 << myLayer);
             mainCamera.rect = new Rect(width * (i % cameraRowNum), height * (i / cameraRowNum), width, height);

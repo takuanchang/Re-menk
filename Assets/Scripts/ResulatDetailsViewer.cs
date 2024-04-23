@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ResulatDetailsViewer : MonoBehaviour
 {
@@ -36,9 +37,26 @@ public class ResulatDetailsViewer : MonoBehaviour
             maxPiece = Mathf.Max(maxPiece, history[i].piecesNums.Item1);
             maxPiece = Mathf.Max(maxPiece, history[i].piecesNums.Item2);
         }
-        for (int i = 0; i < teamCount; i++)
+
+        Color[] colorList = { Color.white, Color.black, Color.red };
+        m_ResultGraph.Initialize(teamHistory[0].Count - 1, maxPiece);
+
+
+
+
+        for (int teamIndex = 0; teamIndex < teamCount; teamIndex++)
         {
-            m_ResultGraph.ShowGraph(teamHistory[i], maxPiece, i);
+            Vector2? lastCircleAnchoredPosition = null;
+
+            for (int i = 0; i < teamHistory[teamIndex].Count; i++)
+            {
+                var anchoredPosition = m_ResultGraph.CreateCircle(i, teamHistory[teamIndex][i], colorList[teamIndex]);
+                if (lastCircleAnchoredPosition != null)
+                {
+                    m_ResultGraph.CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, colorList[teamIndex]);
+                }
+                lastCircleAnchoredPosition = anchoredPosition;
+            }
         }
     }
 

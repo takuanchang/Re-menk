@@ -14,6 +14,9 @@ public class WindowGraph : MonoBehaviour
 
     private Color[] colorList = { Color.white, Color.black, Color.red };
 
+    private float ratioX = 1f;
+    private float ratioY = 1f;
+
     private void Awake()
     {
         m_GraphContainer = transform.Find("GraphContainer").GetComponent<RectTransform>();
@@ -24,52 +27,57 @@ public class WindowGraph : MonoBehaviour
         //ShowGraph(valueList);
     }
 
-    private void CreateCircle(Vector2 anchoredPosition, int color)
+    public void Initialize(int countX, int countY)
     {
+        float graphWidth = m_GraphContainer.sizeDelta.x;
+        float graphHeight = m_GraphContainer.sizeDelta.y;
+
+        ratioX = graphWidth / countX;
+        ratioY = graphHeight / countY;
+    }
+
+    public Vector2 CreateCircle(int x, int y, Color color)
+    {
+        var circlePosition = new Vector2(x * ratioX, y * ratioY);
         GameObject gameObject = new GameObject("circle", typeof(Image));
         gameObject.transform.SetParent(m_GraphContainer, false);
         gameObject.GetComponent<Image>().sprite = m_CircleSprite;
-        gameObject.GetComponent<Image>().color = colorList[color];
+        gameObject.GetComponent<Image>().color = color;
 
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = anchoredPosition;
+        rectTransform.anchoredPosition = circlePosition;
         rectTransform.sizeDelta = m_CircleRectSize;
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.zero;
+        return circlePosition;
     }
 
+    /*
     public void ShowGraph(List<int> valueList, int yMax, int mark)
     {
         Debug.Log(valueList);
 
-        float graphHeight = m_GraphContainer.sizeDelta.y;
-        float graphWidth = m_GraphContainer.sizeDelta.x;
-
+        Initialize(valueList.Count - 1, yMax);
         Vector2? lastCircleAnchoredPosition = null;
 
-        // 要調整
-        // float yMaximum = 64f;
-        float xMaximum = valueList.Count - 1;
 
         for (int i = 0; i < valueList.Count; i++)
         {
-            float xPosition = ((float)i / (float)xMaximum) * graphWidth;
-            float yPosition = ((float)valueList[i] /  (float)yMax) * graphHeight;
-            Vector2 anchoredPosition = new Vector2(xPosition, yPosition);
-            CreateCircle(anchoredPosition, mark);
+            var anchoredPosition = CreateCircle(i, valueList[i], colorList[mark]);
             if (lastCircleAnchoredPosition != null)
             {
-                CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, mark);
+                CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, colorList[mark]);
             }
             lastCircleAnchoredPosition = anchoredPosition;
         }
     }
+    */
 
-    private void CreateDotConnection(Vector2 dotPositionA, Vector2 dotPositionB, int color)
+    public void CreateDotConnection(Vector2 dotPositionA, Vector2 dotPositionB, Color color)
     {
         GameObject gameObject = new GameObject("dotConnection", typeof(Image));
         gameObject.transform.SetParent(m_GraphContainer, false);
-        gameObject.GetComponent<Image>().color = colorList[color];
+        gameObject.GetComponent<Image>().color = color;
 
         RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
         Vector2 dir = (dotPositionB - dotPositionA).normalized;
