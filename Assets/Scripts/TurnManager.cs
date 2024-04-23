@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.Assertions;
 using Cysharp.Threading.Tasks;
 using static HumanPlayer;
+using System.Linq;
 
 public class TurnManager : MonoBehaviour
 {
@@ -46,8 +47,7 @@ public class TurnManager : MonoBehaviour
 
     private CancellationTokenSource m_CancellationTokenSource = null;
 
-    // (プレイヤーの固有番号, ターン数, ターン終了時の残りマス数)
-    private List<(int player, Team team, int turn, int remaining, (int, int) piecesNums)> m_GameHistory;
+    private GameHistory m_GameHistory;
 
     /// <summary>
     /// このプレイヤーからスタートする
@@ -174,6 +174,8 @@ public class TurnManager : MonoBehaviour
             piecesNums.Add(0);
         }
 
+        m_FrontBackCounter.Initialize(teamNum);
+
         m_Board.InitializeBoard();
         m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum, teamNum);
 
@@ -190,7 +192,7 @@ public class TurnManager : MonoBehaviour
         //{
         //    zeroList.Add(0);
         //}
-        m_GameHistory = new List<(int player, Team team, int turn, int remaining, (int, int))>();
+        m_GameHistory.Initialize();
     }
 
     private async UniTaskVoid EndTurn()
@@ -217,16 +219,13 @@ public class TurnManager : MonoBehaviour
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
 
-        m_GameHistory.Add((CurrentPlayer, m_Players[CurrentPlayer].Team, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.CountFrontBack()));
-        Debug.Log(m_GameHistory[m_GameHistory.Count - 1]);
+        // TODO: ここでFrontBack(名前なんだこれ)の更新をかける
+        HistoryData history = new HistoryData(CurrentPlayer, m_Players[CurrentPlayer].Team, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.PiecesCounts.ToList());
+        m_GameHistory.UpdateHistory(history);
+
         m_TurnNum++;
 
         PlayerChange();
         // m_isWaiting = false;
-    }
-
-    public List<(int player, Team team, int turn, int remaining, (int, int) piecesNums)> GetGameHistory()
-    {
-        return m_GameHistory;
     }
 }
