@@ -14,6 +14,7 @@ public class ResulatDetailsViewer : MonoBehaviour
     [SerializeField]
     private WindowGraph m_ResultGraph;
 
+    /*
     public void ViewResulatDetails()
     {
         m_ResultDetailsDisplay.SetActive(true);
@@ -59,6 +60,7 @@ public class ResulatDetailsViewer : MonoBehaviour
             }
         }
     }
+    */
 
     public void BackToMainResult()
     {

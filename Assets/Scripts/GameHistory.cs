@@ -24,7 +24,7 @@ public struct HistoryData
     }
 }
 
-public class GameHistory : MonoBehaviour
+public class GameHistory
 {
     private List<HistoryData> m_GameHistory;
     public IEnumerable<HistoryData> History => m_GameHistory;

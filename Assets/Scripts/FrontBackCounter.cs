@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 
@@ -18,7 +19,7 @@ public class FrontBackCounter : MonoBehaviour
 
     private List<int> m_PiecesCounts;
 
-    public IEnumerable<int> PiecesCounts => m_PiecesCounts;
+    public IReadOnlyList<int> PiecesCounts => m_PiecesCounts.AsReadOnly();
 
     public void Initialize(int teamNum)
     {
@@ -34,6 +35,11 @@ public class FrontBackCounter : MonoBehaviour
         var collectorTransform = m_PiecesCollector.transform;
         var piecesNum = collectorTransform.childCount;
 
+        // 枚数数えなおし
+        for (int i = 0; i < m_PiecesCounts.Count; i++)
+        {
+            m_PiecesCounts[i] = 0;
+        }
         for (int i = 0; i < piecesNum; i++)
         {
             var child = collectorTransform.GetChild(i);
@@ -97,9 +103,10 @@ public class FrontBackCounter : MonoBehaviour
     void Update()
     {
         // フレーム毎に白黒の枚数を数えている
-        var (white, black) = CountFrontBack();
+        //var (white, black) = CountFrontBack();
+        UpdatePiecesCounts();
 
-        m_WhiteCounter.text = white.ToString();
-        m_BlackCounter.text = black.ToString();
+        m_BlackCounter.text = m_PiecesCounts[(int)(Team.Black)].ToString();
+        m_WhiteCounter.text = m_PiecesCounts[(int)(Team.White)].ToString();
     }
 }

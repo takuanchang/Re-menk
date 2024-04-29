@@ -118,20 +118,25 @@ public class TurnManager : MonoBehaviour
         }
         else
         {
-            var (white, black) = m_FrontBackCounter.CountFrontBack();
-
-
-            if (white < black)
-            {
-                result = "Black Win!";
-            }
-            else if (black < white)
-            {
-                result = "White Win!";
-            }
-            else
+            var piecesCounts = m_FrontBackCounter.PiecesCounts;
+            var maxPiecesCount = piecesCounts.Max();
+            var minPiecesCount = piecesCounts.Min();
+            // 全チーム同点の場合
+            if(maxPiecesCount == minPiecesCount)
             {
                 result = "Draw";
+            }
+            // そうでない場合
+            else
+            {
+                for (int i = 0; i < piecesCounts.Count(); i++)
+                {
+                    if (piecesCounts[i] == maxPiecesCount)
+                    {
+                        result += $"{(Team)i} ";
+                    }
+                }
+                result += "Win!";
             }
         }
 
@@ -192,6 +197,7 @@ public class TurnManager : MonoBehaviour
         //{
         //    zeroList.Add(0);
         //}
+        m_GameHistory = new GameHistory();
         m_GameHistory.Initialize();
     }
 

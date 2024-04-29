@@ -14,4 +14,9 @@ public enum Team
     /// 白チーム
     /// </summary>
     White,
+
+    /// <summary>
+    /// テストチーム
+    /// </summary>
+    Test,
 }
