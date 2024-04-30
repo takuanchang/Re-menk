@@ -17,18 +17,21 @@ public class WindowGraph : MonoBehaviour
     private float ratioX = 1f;
     private float ratioY = 1f;
 
+    /*
     private void Awake()
     {
-        m_GraphContainer = transform.Find("GraphContainer").GetComponent<RectTransform>();
+        //m_GraphContainer = transform.Find("GraphContainer").GetComponent<RectTransform>();
 
         //List<int> valueList = new List<int>() { 5, 98, 56, 45, 30, 22, 17, 15, 13, 17, 25, 37, 40, 36, 33 };
         //ShowGraph(valueList);
         //valueList = new List<int>() { 8, 8, 35, 87, 25, 83, 11, 24, 63, 83, 52, 64, 66, 46, 21 };
         //ShowGraph(valueList);
     }
+    */
 
     public void Initialize(int countX, int countY)
     {
+        m_GraphContainer = transform.Find("GraphContainer").GetComponent<RectTransform>();
         float graphWidth = m_GraphContainer.sizeDelta.x;
         float graphHeight = m_GraphContainer.sizeDelta.y;
 

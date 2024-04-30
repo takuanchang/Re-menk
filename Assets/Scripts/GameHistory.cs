@@ -8,11 +8,11 @@ using UnityEngine;
 /// </summary>
 public struct HistoryData
 {
-    int player;
-    Team team;
-    int turn;
-    int remaining;
-    List<int> piecesNums;
+    public int player;
+    public Team team;
+    public int turn;
+    public int remaining;
+    public List<int> piecesNums;
 
     public HistoryData(int player, Team team, int turn, int remaining, List<int> piecesNums)
     {
@@ -27,7 +27,7 @@ public struct HistoryData
 public class GameHistory
 {
     private List<HistoryData> m_GameHistory;
-    public IEnumerable<HistoryData> History => m_GameHistory;
+    public IReadOnlyList<HistoryData> History => m_GameHistory;
 
     public void Initialize()
     {

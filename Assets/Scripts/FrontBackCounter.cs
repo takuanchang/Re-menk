@@ -57,6 +57,7 @@ public class FrontBackCounter : MonoBehaviour
             }
             m_PiecesCounts[(int)piece.Team]++;
         }
+        // m_PiecesCounts[(int)Team.Test] = 2;
     }
 
 

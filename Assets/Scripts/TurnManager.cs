@@ -48,13 +48,13 @@ public class TurnManager : MonoBehaviour
     private CancellationTokenSource m_CancellationTokenSource = null;
 
     private GameHistory m_GameHistory;
+    public GameHistory GameHistory => m_GameHistory;
 
     /// <summary>
     /// このプレイヤーからスタートする
     /// </summary>
     const int StartPlayer = 0;
 
-    private List<int> piecesNums;
 
     public int CurrentPlayer
     {
@@ -166,6 +166,13 @@ public class TurnManager : MonoBehaviour
         _ = EndTurn();
     }
 
+    private void StartFirstTurn()
+    {
+        // リバーシは黒が先行
+        CurrentPlayer = StartPlayer;
+        m_Players[CurrentPlayer].PrepareNextPiece();
+    }
+
     void Start()
     {
         var setting = FindObjectOfType<SettingManager>();
@@ -173,32 +180,25 @@ public class TurnManager : MonoBehaviour
         int cpuNum = setting.ComputerNum;
         int teamNum = setting.TeamNum;
 
-        piecesNums = new List<int>(humanNum + cpuNum);
-        for (int i = 0; i < cpuNum + humanNum; i++)
-        {
-            piecesNums.Add(0);
-        }
-
         m_FrontBackCounter.Initialize(teamNum);
 
         m_Board.InitializeBoard();
         m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum, teamNum);
 
-        // リバーシは黒が先行
-        CurrentPlayer = StartPlayer;
-        m_Players[CurrentPlayer].PrepareNextPiece();
-
         // 仕方ないがUIプリンターにプレイヤー情報を入れる
         // TODO 実装時は表示しない(消す)
         uiPrinter.Initialize(m_Players);
 
-        //List<int> zeroList = new List<int>(cpuNum + humanNum);
-        //for (int i = 0; i < cpuNum + humanNum; i++)
-        //{
-        //    zeroList.Add(0);
-        //}
+        m_TurnNum = 0; // ターン数を0に初期化
+
         m_GameHistory = new GameHistory();
         m_GameHistory.Initialize();
+        // 0ターン目情報の追加
+        HistoryData history = new HistoryData(-1, Team.None, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.PiecesCounts.ToList());
+        m_GameHistory.UpdateHistory(history);
+
+        m_TurnNum++;
+        StartFirstTurn();
     }
 
     private async UniTaskVoid EndTurn()
