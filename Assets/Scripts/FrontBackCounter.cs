@@ -9,10 +9,10 @@ using UnityEngine.UI;
 public class FrontBackCounter : MonoBehaviour
 {
     [SerializeField]
-    private Text m_WhiteCounter;
+    private Text m_TeamLabel;
 
     [SerializeField]
-    private Text m_BlackCounter;
+    private Text m_TeamCounter;
 
     [SerializeField]
     private GameObject m_PiecesCollector;
@@ -24,9 +24,16 @@ public class FrontBackCounter : MonoBehaviour
     public void Initialize(int teamNum)
     {
         m_PiecesCounts = new List<int>(teamNum);
-        for (int i = 0; i < teamNum; ++i)
+        for (int i = 0; i < teamNum; i++)
         {
             m_PiecesCounts.Add(0);
+        }
+
+        m_TeamLabel.text = "";
+        for (int i = 0; i < teamNum; i++)
+        {
+            m_TeamLabel.text += (Team)i;
+            m_TeamLabel.text += "\n";
         }
     }
 
@@ -107,7 +114,10 @@ public class FrontBackCounter : MonoBehaviour
         //var (white, black) = CountFrontBack();
         UpdatePiecesCounts();
 
-        m_BlackCounter.text = m_PiecesCounts[(int)(Team.Black)].ToString();
-        m_WhiteCounter.text = m_PiecesCounts[(int)(Team.White)].ToString();
+        m_TeamCounter.text = "";
+        for (int i = 0; i < m_PiecesCounts.Count; i++)
+        {
+            m_TeamCounter.text += $"{m_PiecesCounts[i]}\n";
+        }
     }
 }
