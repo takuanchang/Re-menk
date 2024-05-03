@@ -35,6 +35,20 @@ public class TitleUI : MonoBehaviour
     /// </summary>
     const string GameSceneName = "Main";
 
+
+    // TODO:以下わざわざ持っとくべきかは要議論
+    [SerializeField]
+    private Slider m_HumanSlider;
+    [SerializeField]
+    private Slider m_ComputerSlider;
+    [SerializeField]
+    private Slider m_TeamSlider;
+
+    private int m_HumanNum = 2;
+    private int m_ComputerNum = 0;
+    private int m_TeamNum = 2;
+
+
     public void Start()
     {
         setting = FindObjectOfType<SettingManager>();
@@ -62,7 +76,7 @@ public class TitleUI : MonoBehaviour
         {
             return;
         }
-        m_RaycastGuard.SetActive(true);
+        // SelectModeから
         m_CustomModePanel.SetActive(true);
         m_SelectModePanel.SetActive(false);
 
@@ -75,7 +89,7 @@ public class TitleUI : MonoBehaviour
         {
             return;
         }
-        m_RaycastGuard.SetActive(false);
+        // SelectModeに戻る
         m_CustomModePanel.SetActive(false);
         m_SelectModePanel.SetActive(true);
 
@@ -229,11 +243,32 @@ public class TitleUI : MonoBehaviour
         m_HowToPages[m_NowHowToPage].SetActive(true);
     }
 
+    /// <summary>
+    /// settingId : 上位4ビットは人間の数、下位4ビットはCPUの数
+    /// </summary>
+    /// <param name="settingId"></param>
     public void SetGameMode(int settingId)
     {
-        // settingId : 上位4ビットは人間の数、下位4ビットはCPUの数
         int cpu = settingId & 0b1111;
         int human = settingId >> 4;
-        setting.SendMessage("SetGameMode", (human, cpu));
+        setting.SendMessage("SetGameMode", (human, cpu, m_TeamNum));　// TODO:カスタムで変更した状態で1人プレイ2人プレイ等を選ぶとチームの数がバグる
+    }
+
+    public void ChangeSettingNum()
+    {
+        m_HumanNum = (int)m_HumanSlider.value;
+        m_ComputerNum = (int)m_ComputerSlider.value;
+        m_TeamNum = (int)m_TeamSlider.value;
+    }
+
+    public void StartCustomMode()
+    {
+        var playersNum = m_HumanNum + m_ComputerNum;
+        if (playersNum < 2 || playersNum > 16)
+        {
+            return;
+        }
+        SetGameMode((m_HumanNum << 4) + m_ComputerNum);
+        ChangeToGameScene();// TODO:startボタンのインタラクタブル設定により排除するべき
     }
 }
