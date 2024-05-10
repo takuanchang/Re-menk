@@ -43,6 +43,16 @@ public class TitleUI : MonoBehaviour
     private Slider m_ComputerSlider;
     [SerializeField]
     private Slider m_TeamSlider;
+    [SerializeField]
+    private Button m_CustomStartButton;
+    [SerializeField]
+    private Text m_HumanNumText;
+    [SerializeField]
+    private Text m_ComputerNumText;
+    [SerializeField]
+    private Text m_TeamNumText;
+    [SerializeField]
+    private Text m_CustomAlertText;
 
     private int m_HumanNum = 2;
     private int m_ComputerNum = 0;
@@ -244,14 +254,15 @@ public class TitleUI : MonoBehaviour
     }
 
     /// <summary>
-    /// settingId : 上位4ビットは人間の数、下位4ビットはCPUの数
+    /// settingId : チーム数、人間の数(4ビット)、CPUの数(4ビット)で構成
     /// </summary>
     /// <param name="settingId"></param>
     public void SetGameMode(int settingId)
     {
         int cpu = settingId & 0b1111;
-        int human = settingId >> 4;
-        setting.SendMessage("SetGameMode", (human, cpu, m_TeamNum));　// TODO:カスタムで変更した状態で1人プレイ2人プレイ等を選ぶとチームの数がバグる
+        int human = (settingId >> 4) & 0b1111;
+        int team = settingId >> 8;
+        setting.SendMessage("SetGameMode", (human, cpu, team));
     }
 
     public void ChangeSettingNum()
@@ -259,16 +270,27 @@ public class TitleUI : MonoBehaviour
         m_HumanNum = (int)m_HumanSlider.value;
         m_ComputerNum = (int)m_ComputerSlider.value;
         m_TeamNum = (int)m_TeamSlider.value;
+
+        m_HumanNumText.text = $"{m_HumanNum}";
+        m_ComputerNumText.text = $"{m_ComputerNum}";
+        m_TeamNumText.text = $"{m_TeamNum}";
+
+        // startボタンの処理(ここに書くべきか)
+        var playersNum = m_HumanNum + m_ComputerNum;
+        if(playersNum < 2 || playersNum > 16)
+        {
+            m_CustomAlertText.enabled = true;
+            m_CustomStartButton.interactable = false;
+        }
+        else
+        {
+            m_CustomAlertText.enabled = false;
+            m_CustomStartButton.interactable = true;
+        }
     }
 
     public void StartCustomMode()
     {
-        var playersNum = m_HumanNum + m_ComputerNum;
-        if (playersNum < 2 || playersNum > 16)
-        {
-            return;
-        }
-        SetGameMode((m_HumanNum << 4) + m_ComputerNum);
-        ChangeToGameScene();// TODO:startボタンのインタラクタブル設定により排除するべき
+        SetGameMode((m_TeamNum << 8) + (m_HumanNum << 4) + m_ComputerNum);
     }
 }
