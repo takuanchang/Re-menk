@@ -182,7 +182,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
         //m_FreeLookCamera.Priority = NonUsingPriority;
 
         // レティクルのアニメーションを選択中のものに変更
-        Debug.Log("hoge");
         m_ReticuleControler.ChangeAnimation(GameState.Selecting);
 
         return true;

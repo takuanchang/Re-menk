@@ -48,6 +48,10 @@ public class Piece : MonoBehaviour
     private GameObject m_SpeedEffect;
     [SerializeField]
     private ParticleSystem m_ExplosionEffect;
+    [SerializeField]
+    private Material m_UpMaterial;
+    [SerializeField]
+    private Material m_BottomMaterial;
 
     private GameObject m_Kiraan;
 
@@ -68,27 +72,55 @@ public class Piece : MonoBehaviour
     private static readonly float YMaxLimit = 30;
 
     /// <summary>
+    /// 各チームの色
+    /// </summary>
+    private static readonly Color[] TeamColors = { Color.black, Color.white, Color.blue };
+
+    /// <summary>
     /// 初期状態でどのチームに属しているかを与えて駒を初期化する
     /// </summary>
     /// <param name="initialTeam">初期状態のチーム</param>
-    public void Initialize(Team initialTeam, PiecesManager piecesManager) {
+    public void Initialize(Team initialTeam, PiecesManager piecesManager, int teamNum) {
         // 初期化時に無効なチームを設定しようとした場合はアサートする
         Assert.AreNotEqual(initialTeam, Team.None, $"Do NOT set invalid teams at initialization");
         // チームを設定する
         Team = initialTeam;
         // 管理者を設定
         m_PiecesManager= piecesManager;
+
+        Material[] pieceMaterials = GetComponent<MeshRenderer>().materials;
+        Shader upShader = pieceMaterials[0].shader;
+        Shader bottomShader = pieceMaterials[1].shader;
+        pieceMaterials[0] = new Material(upShader);
+        pieceMaterials[1] = new Material(bottomShader);
+
         // チームに応じて向きを設定する
         switch (initialTeam)
         {
             // 黒は表向き
             case Team.Black:
                 transform.rotation = Quaternion.identity;
+                pieceMaterials[0].color = TeamColors[((int)Team.Black)];
+                pieceMaterials[1].color = TeamColors[((int)Team.Black + 1) % teamNum];
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black)].r, TeamColors[((int)Team.Black)].g, TeamColors[((int)Team.Black)].b);
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black + 1) % teamNum].r, TeamColors[((int)Team.Black + 1) % teamNum].g, TeamColors[((int)Team.Black + 1) % teamNum].b);
                 break;
 
             // 白は表向き
             case Team.White:
-                transform.rotation = Quaternion.Euler(180, 0, 0);
+                transform.rotation = Quaternion.identity;
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.White)].r, TeamColors[((int)Team.White)].g, TeamColors[((int)Team.White)].b);
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.White + 1) % teamNum].r, TeamColors[((int)Team.White + 1) % teamNum].g, TeamColors[((int)Team.White + 1) % teamNum].b);
+                pieceMaterials[0].color = TeamColors[((int)Team.White)];
+                pieceMaterials[1].color = TeamColors[((int)Team.White + 1) % teamNum];
+                break;
+
+            case Team.Blue:
+                transform.rotation = Quaternion.identity;
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Blue)].r, TeamColors[((int)Team.Blue)].g, TeamColors[((int)Team.Blue)].b);
+                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Blue + 1) % teamNum].r, TeamColors[((int)Team.Blue + 1) % teamNum].g, TeamColors[((int)Team.Blue + 1) % teamNum].b);
+                pieceMaterials[0].color = TeamColors[((int)Team.Blue)];
+                pieceMaterials[1].color = TeamColors[((int)Team.Blue + 1) % teamNum];
                 break;
 
             // その他はありえない
@@ -113,8 +145,6 @@ public class Piece : MonoBehaviour
 
         m_Kiraan = GameObject.Find("Kiraan");
         m_Kiraan.GetComponent<MeshRenderer>().enabled = false;
-
-        Debug.Log(m_Kiraan);
 
         // フラグを切る
         m_isDead = false;
@@ -265,7 +295,6 @@ public class Piece : MonoBehaviour
 
                 Thrower.LookUpSky(); // ParticleEffectのtransformって使えたっけ？
                 await UniTask.Delay(1000);
-                Debug.Log(m_Kiraan);
                 m_Kiraan.GetComponent<MeshRenderer>().enabled = true;
                 m_Kiraan.GetComponent<Transform>().position = transform.position;
                 m_Kiraan.GetComponent<Animator>().Play("KiraanAnime", 0, 0.0f);
