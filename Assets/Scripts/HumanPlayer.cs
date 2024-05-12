@@ -284,11 +284,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                     //m_PieceCamera.Priority = UsingPriority;
                     ChangeCamerasPriority(UsingCamera.Piece);
-                    if(Team == Team.White)
-                    {
-                        var body = m_PieceCamera.GetCinemachineComponent<Cinemachine.CinemachineTransposer>();
-                        body.m_FollowOffset.z = 5;
-                    }
                 }
 
                 break;

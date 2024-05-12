@@ -91,8 +91,8 @@ public class Piece : MonoBehaviour
         Material[] pieceMaterials = GetComponent<MeshRenderer>().materials;
         Shader upShader = pieceMaterials[0].shader;
         Shader bottomShader = pieceMaterials[1].shader;
-        pieceMaterials[0] = new Material(upShader);
-        pieceMaterials[1] = new Material(bottomShader);
+        GetComponent<MeshRenderer>().materials[0] = new Material(upShader);
+        GetComponent<MeshRenderer>().materials[1] = new Material(bottomShader);
 
         // チームに応じて向きを設定する
         switch (initialTeam)
@@ -108,6 +108,7 @@ public class Piece : MonoBehaviour
 
             // 白は表向き
             case Team.White:
+                Debug.Log(initialTeam);
                 transform.rotation = Quaternion.identity;
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.White)].r, TeamColors[((int)Team.White)].g, TeamColors[((int)Team.White)].b);
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.White + 1) % teamNum].r, TeamColors[((int)Team.White + 1) % teamNum].g, TeamColors[((int)Team.White + 1) % teamNum].b);
