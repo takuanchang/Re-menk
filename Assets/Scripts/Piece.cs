@@ -40,6 +40,8 @@ public class Piece : MonoBehaviour
     /// </summary>
     public Team Team { get; private set; } = Team.None;
 
+    private Team m_UpTeam, m_BottomTeam;
+
     /// <summary>
     /// 爆発出来る速さの最小値
     /// </summary>
@@ -102,6 +104,8 @@ public class Piece : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 pieceMaterials[0].color = TeamColors[((int)Team.Black)];
                 pieceMaterials[1].color = TeamColors[((int)Team.Black + 1) % teamNum];
+                m_UpTeam = Team.Black;
+                m_BottomTeam = (Team)(((int)Team.Black + 1) % teamNum);
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black)].r, TeamColors[((int)Team.Black)].g, TeamColors[((int)Team.Black)].b);
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black + 1) % teamNum].r, TeamColors[((int)Team.Black + 1) % teamNum].g, TeamColors[((int)Team.Black + 1) % teamNum].b);
                 break;
@@ -114,6 +118,8 @@ public class Piece : MonoBehaviour
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.White + 1) % teamNum].r, TeamColors[((int)Team.White + 1) % teamNum].g, TeamColors[((int)Team.White + 1) % teamNum].b);
                 pieceMaterials[0].color = TeamColors[((int)Team.White)];
                 pieceMaterials[1].color = TeamColors[((int)Team.White + 1) % teamNum];
+                m_UpTeam = Team.White;
+                m_BottomTeam = (Team)(((int)Team.White + 1) % teamNum);
                 break;
 
             case Team.Blue:
@@ -122,6 +128,8 @@ public class Piece : MonoBehaviour
                 //m_UpMaterial.color = new Color(TeamColors[((int)Team.Blue + 1) % teamNum].r, TeamColors[((int)Team.Blue + 1) % teamNum].g, TeamColors[((int)Team.Blue + 1) % teamNum].b);
                 pieceMaterials[0].color = TeamColors[((int)Team.Blue)];
                 pieceMaterials[1].color = TeamColors[((int)Team.Blue + 1) % teamNum];
+                m_UpTeam = Team.Blue;
+                m_BottomTeam = (Team)(((int)Team.Blue + 1) % teamNum);
                 break;
 
             // その他はありえない
@@ -136,10 +144,6 @@ public class Piece : MonoBehaviour
 
         // Shoot時に表示するエフェクトを非表示にする
         m_SpeedEffect.SetActive(false);
-        if (initialTeam == Team.White)
-        {
-            m_SpeedEffect.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 180.0f);
-        }
 
         m_ExplosionEffect.Stop();
         m_ExplosionEffect.Clear();
@@ -165,9 +169,9 @@ public class Piece : MonoBehaviour
         if (Mathf.Abs(up.y) < Epsilon) {
             Team = Team.None; // どちらともいえない
         } else if (up.y > 0.0f) {
-            Team = Team.Black; // 表なら黒
+            Team = m_UpTeam;
         } else {
-            Team = Team.White; // 裏なら白
+            Team = m_BottomTeam;
         }
     }
 
