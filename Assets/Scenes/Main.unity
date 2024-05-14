@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TurnManager: {fileID: 1716532854}
-  m_OriginalPiece: {fileID: 4039761993789567743, guid: 9af4315a27eb8ce488f8d647f54833cd, type: 3}
+  m_OriginalPiece: {fileID: 6020655769770433292, guid: 5f7a9752a7cd7b5479d6075fc1a18ee5, type: 3}
 --- !u!1 &286807094
 GameObject:
   m_ObjectHideFlags: 3

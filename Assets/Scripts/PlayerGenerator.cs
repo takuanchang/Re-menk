@@ -51,7 +51,6 @@ public class PlayerGenerator : MonoBehaviour
 
     public List<IPlayer> GeneratePlayers(int humanNum, int cpuNum, int teamNum)
     {
-
         var piecesManager = GameObject.Find(PiecesManager).GetComponent<PiecesManager>();
         var boardObject = GameObject.Find(BoardObjectName);
         var boardRoot = boardObject.transform;
