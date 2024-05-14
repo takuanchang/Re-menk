@@ -96,46 +96,16 @@ public class Piece : MonoBehaviour
         GetComponent<MeshRenderer>().materials[0] = new Material(upShader);
         GetComponent<MeshRenderer>().materials[1] = new Material(bottomShader);
 
-        // チームに応じて向きを設定する
-        switch (initialTeam)
+        // チームに応じて色を変える
+        if (initialTeam == Team.None)
         {
-            // 黒は表向き
-            case Team.Black:
-                transform.rotation = Quaternion.identity;
-                pieceMaterials[0].color = TeamColors[((int)Team.Black)];
-                pieceMaterials[1].color = TeamColors[((int)Team.Black + 1) % teamNum];
-                m_UpTeam = Team.Black;
-                m_BottomTeam = (Team)(((int)Team.Black + 1) % teamNum);
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black)].r, TeamColors[((int)Team.Black)].g, TeamColors[((int)Team.Black)].b);
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Black + 1) % teamNum].r, TeamColors[((int)Team.Black + 1) % teamNum].g, TeamColors[((int)Team.Black + 1) % teamNum].b);
-                break;
-
-            // 白は表向き
-            case Team.White:
-                Debug.Log(initialTeam);
-                transform.rotation = Quaternion.identity;
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.White)].r, TeamColors[((int)Team.White)].g, TeamColors[((int)Team.White)].b);
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.White + 1) % teamNum].r, TeamColors[((int)Team.White + 1) % teamNum].g, TeamColors[((int)Team.White + 1) % teamNum].b);
-                pieceMaterials[0].color = TeamColors[((int)Team.White)];
-                pieceMaterials[1].color = TeamColors[((int)Team.White + 1) % teamNum];
-                m_UpTeam = Team.White;
-                m_BottomTeam = (Team)(((int)Team.White + 1) % teamNum);
-                break;
-
-            case Team.Blue:
-                transform.rotation = Quaternion.identity;
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Blue)].r, TeamColors[((int)Team.Blue)].g, TeamColors[((int)Team.Blue)].b);
-                //m_UpMaterial.color = new Color(TeamColors[((int)Team.Blue + 1) % teamNum].r, TeamColors[((int)Team.Blue + 1) % teamNum].g, TeamColors[((int)Team.Blue + 1) % teamNum].b);
-                pieceMaterials[0].color = TeamColors[((int)Team.Blue)];
-                pieceMaterials[1].color = TeamColors[((int)Team.Blue + 1) % teamNum];
-                m_UpTeam = Team.Blue;
-                m_BottomTeam = (Team)(((int)Team.Blue + 1) % teamNum);
-                break;
-
-            // TODO:他のチームをどうするか
-            default:
-                break;
+            // 今は何もしない
         }
+        transform.rotation = Quaternion.identity;
+        pieceMaterials[0].color = TeamColors[(int)initialTeam];
+        pieceMaterials[1].color = TeamColors[((int)initialTeam + 1) % teamNum];
+        m_UpTeam = initialTeam;
+        m_BottomTeam = (Team)(((int)initialTeam + 1) % teamNum);
 
         // 駒のRigidbodyを取得して重力を切る
         rb = GetComponent<Rigidbody>();
