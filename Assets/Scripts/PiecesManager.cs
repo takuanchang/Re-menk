@@ -12,12 +12,14 @@ public class PiecesManager : MonoBehaviour
     [SerializeField]
     private Piece m_OriginalPiece;
 
+    private int m_TeamNum;
+
     private static readonly Vector3 InitialPosition = new Vector3(3.5f, 5.0f, 3.5f);
     public Piece CreatePiece(Team team)
     {
         var position = InitialPosition;
         var piece = Instantiate(m_OriginalPiece, position, Quaternion.identity, transform);
-        piece.Initialize(team, this);
+        piece.Initialize(team, this, m_TeamNum);
 
         m_Pieces.Add(piece);
         return piece;  
@@ -67,5 +69,11 @@ public class PiecesManager : MonoBehaviour
         }
 
         return piecesNums;
+    }
+
+    public void Start()
+    {
+        var setting = FindObjectOfType<SettingManager>();
+        m_TeamNum = setting.TeamNum;
     }
 }

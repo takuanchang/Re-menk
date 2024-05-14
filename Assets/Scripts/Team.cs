@@ -16,6 +16,11 @@ public enum Team
     White,
 
     /// <summary>
+    /// 青チーム
+    /// </summary>
+    Blue,
+
+    /// <summary>
     /// テストチーム
     /// </summary>
     Test,
