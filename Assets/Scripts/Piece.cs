@@ -91,7 +91,7 @@ public class Piece : MonoBehaviour
                 transform.rotation = Quaternion.Euler(180, 0, 0);
                 break;
 
-            // その他はありえない
+            // TODO:他のチームをどうするか
             default:
                 break;
         }

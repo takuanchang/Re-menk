@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.Assertions;
 using Cysharp.Threading.Tasks;
 using static HumanPlayer;
+using System.Linq;
 
 public class TurnManager : MonoBehaviour
 {
@@ -27,6 +28,9 @@ public class TurnManager : MonoBehaviour
     private GameObject m_ResultUI;
 
     [SerializeField]
+    private GameObject m_ResulatDetailsUI;
+
+    [SerializeField]
     private Text m_ResultText;
 
     [SerializeField]
@@ -43,13 +47,14 @@ public class TurnManager : MonoBehaviour
 
     private CancellationTokenSource m_CancellationTokenSource = null;
 
-    // (プレイヤーの固有番号, ターン数, ターン終了時の残りマス数)
-    private List<(int player, int turn, int remaining)> m_GameHistory;
+    private GameHistory m_GameHistory;
+    public GameHistory GameHistory => m_GameHistory;
 
     /// <summary>
     /// このプレイヤーからスタートする
     /// </summary>
     const int StartPlayer = 0;
+
 
     public int CurrentPlayer
     {
@@ -113,20 +118,25 @@ public class TurnManager : MonoBehaviour
         }
         else
         {
-            var (white, black) = m_FrontBackCounter.CountFrontBack();
-
-
-            if (white < black)
-            {
-                result = "Black Win!";
-            }
-            else if (black < white)
-            {
-                result = "White Win!";
-            }
-            else
+            var piecesCounts = m_FrontBackCounter.PiecesCounts;
+            var maxPiecesCount = piecesCounts.Max();
+            var minPiecesCount = piecesCounts.Min();
+            // 全チーム同点の場合
+            if(maxPiecesCount == minPiecesCount)
             {
                 result = "Draw";
+            }
+            // そうでない場合
+            else
+            {
+                for (int i = 0; i < piecesCounts.Count(); i++)
+                {
+                    if (piecesCounts[i] == maxPiecesCount)
+                    {
+                        result += $"{(Team)i} ";
+                    }
+                }
+                result += "Win!";
             }
         }
 
@@ -156,24 +166,39 @@ public class TurnManager : MonoBehaviour
         _ = EndTurn();
     }
 
+    private void StartFirstTurn()
+    {
+        // リバーシは黒が先行
+        CurrentPlayer = StartPlayer;
+        m_Players[CurrentPlayer].PrepareNextPiece();
+    }
+
     void Start()
     {
         var setting = FindObjectOfType<SettingManager>();
         int humanNum = setting.HumanNum;
         int cpuNum = setting.ComputerNum;
+        int teamNum = setting.TeamNum;
+
+        m_FrontBackCounter.Initialize(teamNum);
 
         m_Board.InitializeBoard();
-        m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum);
-
-        // リバーシは黒が先行
-        CurrentPlayer = StartPlayer;
-        m_Players[CurrentPlayer].PrepareNextPiece();
+        m_Players = m_PlayerGenerator.GeneratePlayers(humanNum, cpuNum, teamNum);
 
         // 仕方ないがUIプリンターにプレイヤー情報を入れる
         // TODO 実装時は表示しない(消す)
         uiPrinter.Initialize(m_Players);
 
-        m_GameHistory = new List<(int player, int turn, int remaining)>();
+        m_TurnNum = 0; // ターン数を0に初期化
+
+        m_GameHistory = new GameHistory();
+        m_GameHistory.Initialize();
+        // 0ターン目情報の追加
+        HistoryData history = new HistoryData(-1, Team.None, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.PiecesCounts.ToList());
+        m_GameHistory.UpdateHistory(history);
+
+        m_TurnNum++;
+        StartFirstTurn();
     }
 
     private async UniTaskVoid EndTurn()
@@ -200,8 +225,10 @@ public class TurnManager : MonoBehaviour
             await UniTask.Delay(TimeSpan.FromSeconds(Span), cancellationToken: token);
         }
 
-        m_GameHistory.Add((CurrentPlayer, m_TurnNum, m_Board.GetRemainingSquaresNum()));
-        Debug.Log(m_GameHistory[m_GameHistory.Count - 1]);
+        // TODO: ここでFrontBack(名前なんだこれ)の更新をかける
+        HistoryData history = new HistoryData(CurrentPlayer, m_Players[CurrentPlayer].Team, m_TurnNum, m_Board.GetRemainingSquaresNum(), m_FrontBackCounter.PiecesCounts.ToList());
+        m_GameHistory.UpdateHistory(history);
+
         m_TurnNum++;
 
         PlayerChange();

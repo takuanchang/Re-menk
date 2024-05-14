@@ -6,6 +6,7 @@ public class SettingManager : MonoBehaviour
 {
     private int m_HumanNum;
     private int m_ComputerNum;
+    private int m_TeamNum = 2;
 
     public int HumanNum
     {
@@ -27,15 +28,26 @@ public class SettingManager : MonoBehaviour
         }
     }
 
+    public int TeamNum
+    {
+        get => m_TeamNum;
+
+        private set
+        {
+            m_TeamNum = value;
+        }
+    }
+
     // Start is called before the first frame update
     void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void SetGameMode((int human, int cpu) player)
+    public void SetGameMode((int human, int cpu, int team) set)
     {
-        m_HumanNum = player.human;
-        m_ComputerNum = player.cpu;
+        m_HumanNum = set.human;
+        m_ComputerNum = set.cpu;
+        m_TeamNum = set.team;
     }
 }

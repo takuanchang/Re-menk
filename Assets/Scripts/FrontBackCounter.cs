@@ -1,20 +1,74 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 
 public class FrontBackCounter : MonoBehaviour
 {
     [SerializeField]
-    private Text m_WhiteCounter;
+    private Text m_TeamLabel;
 
     [SerializeField]
-    private Text m_BlackCounter;
+    private Text m_TeamCounter;
 
     [SerializeField]
     private GameObject m_PiecesCollector;
 
+    private List<int> m_PiecesCounts;
+
+    public IReadOnlyList<int> PiecesCounts => m_PiecesCounts.AsReadOnly();
+
+    public void Initialize(int teamNum)
+    {
+        m_PiecesCounts = new List<int>(teamNum);
+        for (int i = 0; i < teamNum; i++)
+        {
+            m_PiecesCounts.Add(0);
+        }
+
+        m_TeamLabel.text = "";
+        for (int i = 0; i < teamNum; i++)
+        {
+            m_TeamLabel.text += (Team)i;
+            m_TeamLabel.text += "\n";
+        }
+    }
+
+    public void UpdatePiecesCounts()
+    {
+        var collectorTransform = m_PiecesCollector.transform;
+        var piecesNum = collectorTransform.childCount;
+
+        // 枚数数えなおし
+        for (int i = 0; i < m_PiecesCounts.Count; i++)
+        {
+            m_PiecesCounts[i] = 0;
+        }
+        for (int i = 0; i < piecesNum; i++)
+        {
+            var child = collectorTransform.GetChild(i);
+            if (!child.TryGetComponent<Piece>(out var piece))
+            {
+                continue;
+            }
+
+            // 確実にチームが更新される保証があるなら不要だが、念のためチームを更新
+            piece.UpdateTeam();
+
+            if(piece.Team == Team.None)
+            {
+                continue;
+            }
+            m_PiecesCounts[(int)piece.Team]++;
+        }
+        // m_PiecesCounts[(int)Team.Test] = 2;
+    }
+
+
+    /*
     public (int, int) CountFrontBack()
     {
         var collectorTransform = m_PiecesCollector.transform;
@@ -52,13 +106,18 @@ public class FrontBackCounter : MonoBehaviour
 
         return (whiteCount, blackCount);
     }
+    */
 
     void Update()
     {
         // フレーム毎に白黒の枚数を数えている
-        var (white, black) = CountFrontBack();
+        //var (white, black) = CountFrontBack();
+        UpdatePiecesCounts();
 
-        m_WhiteCounter.text = white.ToString();
-        m_BlackCounter.text = black.ToString();
+        m_TeamCounter.text = "";
+        for (int i = 0; i < m_PiecesCounts.Count; i++)
+        {
+            m_TeamCounter.text += $"{m_PiecesCounts[i]}\n";
+        }
     }
 }
