@@ -44,10 +44,10 @@ public class SettingManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void SetGameMode((int human, int cpu, int team) set)
+    public void SetGameMode(Setting set)
     {
-        m_HumanNum = set.human;
-        m_ComputerNum = set.cpu;
-        m_TeamNum = set.team;
+        m_HumanNum = set.humanNum;
+        m_ComputerNum = set.computerNum;
+        m_TeamNum = set.teamNum;
     }
 }

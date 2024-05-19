@@ -28,7 +28,7 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private Button m_RightArrow;
 
-    private SettingManager setting;
+    private SettingManager settingManager;
 
     /// <summary>
     /// 読み込むゲームシーン名
@@ -54,14 +54,11 @@ public class TitleUI : MonoBehaviour
     [SerializeField]
     private Text m_CustomAlertText;
 
-    private int m_HumanNum = 2;
-    private int m_ComputerNum = 0;
-    private int m_TeamNum = 2;
-
+    private Setting m_Setting = new(2, 0, 2);
 
     public void Start()
     {
-        setting = FindObjectOfType<SettingManager>();
+        settingManager = FindObjectOfType<SettingManager>();
     }
 
     public void ChangeToGameScene()
@@ -253,31 +250,26 @@ public class TitleUI : MonoBehaviour
         m_HowToPages[m_NowHowToPage].SetActive(true);
     }
 
-    /// <summary>
-    /// settingId : チーム数、人間の数(4ビット)、CPUの数(4ビット)で構成
-    /// </summary>
-    /// <param name="settingId"></param>
-    public void SetGameMode(int settingId)
+
+    //------------------------------------------------------------------------
+    // 以下別にクラスを分けるべきと思われる
+    public void SetGameMode(Setting set)
     {
-        int cpu = settingId & 0b1111;
-        int human = (settingId >> 4) & 0b1111;
-        int team = settingId >> 8;
-        setting.SendMessage("SetGameMode", (human, cpu, team));
+        settingManager.SendMessage("SetGameMode", set);
     }
 
     public void ChangeSettingNum()
     {
-        m_HumanNum = (int)m_HumanSlider.value;
-        m_ComputerNum = (int)m_ComputerSlider.value;
-        m_TeamNum = (int)m_TeamSlider.value;
+        m_Setting.humanNum = (int)m_HumanSlider.value;
+        m_Setting.computerNum = (int)m_ComputerSlider.value;
+        m_Setting.teamNum = (int)m_TeamSlider.value;
 
-        m_HumanNumText.text = $"{m_HumanNum}";
-        m_ComputerNumText.text = $"{m_ComputerNum}";
-        m_TeamNumText.text = $"{m_TeamNum}";
+        m_HumanNumText.text = $"{m_Setting.humanNum}";
+        m_ComputerNumText.text = $"{m_Setting.computerNum}";
+        m_TeamNumText.text = $"{m_Setting.teamNum}";
 
         // startボタンの処理(ここに書くべきか)
-        var playersNum = m_HumanNum + m_ComputerNum;
-        if(playersNum < 2 || playersNum > 16)
+        if(m_Setting.PlayersNum < 2 || m_Setting.PlayersNum > 16)
         {
             m_CustomAlertText.enabled = true;
             m_CustomStartButton.interactable = false;
@@ -289,8 +281,17 @@ public class TitleUI : MonoBehaviour
         }
     }
 
-    public void StartCustomMode()
+    // TODO:可能なら一人用、二人用の設定はSetting側に用意したい
+    public void SetSingleMode()
     {
-        SetGameMode((m_TeamNum << 8) + (m_HumanNum << 4) + m_ComputerNum);
+        SetGameMode(new Setting(1, 1, 2));
+    }
+    public void SetDoubleMode()
+    {
+        SetGameMode(new Setting(2, 0, 2));
+    }
+    public void SetCustomMode()
+    {
+        SetGameMode(m_Setting);
     }
 }

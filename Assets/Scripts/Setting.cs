@@ -4,7 +4,7 @@ public struct Setting
     public int computerNum;
     public int teamNum;
 
-    public readonly int PlayerNum => humanNum + computerNum;
+    public readonly int PlayersNum => humanNum + computerNum;
 
     public Setting(int humanNum, int computerNum, int teamNum)
     {
