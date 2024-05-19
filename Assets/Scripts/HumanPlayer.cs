@@ -50,7 +50,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     private Transform m_Sky;
 
 
-    [SerializeField] private float rayLength = 20.0f;
+    [SerializeField] private float m_RayLength = 20.0f;
 
     private Transform m_Reticule;
     private ReticuleControler m_ReticuleControler;
@@ -64,15 +64,15 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     }
     private Phase m_Phase = Phase.SquareSelect;
 
-    private Vector3 targetPosition = Vector3.zero;
+    private Vector3 m_TargetPosition = Vector3.zero;
     private Queue<MouseLog> m_MouseHistory = new();
-    private float sumTime = 0.0f;
+    private float m_SumTime = 0.0f;
     // 速さ決定時の履歴保存秒数の閾値
-    static readonly float threshold = 0.1f;
+    private static readonly float SpeedSamplingTime = 0.1f;
 
     // パラメータ群
-    [SerializeField] private float directionParam = 3.0f;
-    [SerializeField] private float speedParam = 1.0f;
+    [SerializeField] private float m_DirectionParam = 3.0f;
+    [SerializeField] private float m_SpeedParam = 1.0f;
 
     /// <summary>
     /// ピースの高さ
@@ -193,13 +193,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
     }
 
     private Vector3 CalcurateDirection(Vector3 mousePos) {
-        var gap = mousePos - targetPosition;
+        var gap = mousePos - m_TargetPosition;
         (gap.y, gap.z) = (0.0f, gap.y);
         // 座標変換でカメラの方向とズレの方向を調整
         gap = RotateThrowingVector(gap);
 
         gap /= MathF.Min(Screen.width, Screen.height);
-        gap *= directionParam;
+        gap *= m_DirectionParam;
         // Debug.Log(gap);
         return gap;
     }
@@ -214,7 +214,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
             (_, prePos) = (dt, pos);
         }
         speed /= history.Count;
-        return speed * speedParam;
+        return speed * m_SpeedParam;
     }
 
     public void Throw(Vector3 dir) {
@@ -254,7 +254,7 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 // マウスからレイを飛ばす
 
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition); // 人間依存
-                if (Physics.Raycast(ray, out var hit, rayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
+                if (Physics.Raycast(ray, out var hit, m_RayLength, m_SquareLayerMask, QueryTriggerInteraction.Ignore)) // 人間依存
                 {
                     var col = hit.collider;
                     if(col!= m_SquareCollider)
@@ -299,9 +299,9 @@ public class HumanPlayer : MonoBehaviour , IPlayer
                 }
                 if (Input.GetMouseButtonDown(0))
                 {
-                    sumTime = 0.0f;
+                    m_SumTime = 0.0f;
                     m_MouseHistory.Clear();
-                    targetPosition = Input.mousePosition;
+                    m_TargetPosition = Input.mousePosition;
                     m_Phase = Phase.PieceThrow;
                     m_ReticuleControler.ChangeAnimation(GameState.WatingThrow);
                 }
@@ -319,13 +319,13 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
                 // 人間はこんな感じ
                 float dt = Time.deltaTime;
-                sumTime += dt;
+                m_SumTime += dt;
                 var mousePos = Input.mousePosition;
                 m_MouseHistory.Enqueue(new(dt, mousePos));
-                while (sumTime - m_MouseHistory.Peek().deltaTime > threshold)
+                while (m_SumTime - m_MouseHistory.Peek().deltaTime > SpeedSamplingTime)
                 {
                     var (deltaTime, _) = m_MouseHistory.Dequeue();
-                    sumTime -= deltaTime;
+                    m_SumTime -= deltaTime;
                 }
                 if (Input.GetMouseButtonUp(0))
                 {

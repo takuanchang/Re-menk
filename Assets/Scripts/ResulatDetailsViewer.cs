@@ -15,7 +15,7 @@ public class ResulatDetailsViewer : MonoBehaviour
     [SerializeField]
     private WindowGraph m_ResultGraph;
 
-    Color[] colorList = { Color.black, Color.white, Color.blue }; // TODO:要調整
+    private Color[] m_ColorList = { Color.black, Color.white, Color.blue }; // TODO:要調整
 
     private bool m_IsGenerated = false;
     void GenerateGraph()
@@ -38,10 +38,10 @@ public class ResulatDetailsViewer : MonoBehaviour
 
             for (int turn = 0; turn < history.Count; turn++)
             {
-                var anchoredPosition = m_ResultGraph.CreateCircle(turn, history[turn].piecesNums[teamIndex], colorList[teamIndex]);
+                var anchoredPosition = m_ResultGraph.CreateCircle(turn, history[turn].piecesNums[teamIndex], m_ColorList[teamIndex]);
                 if (lastCircleAnchoredPosition != null)
                 {
-                    m_ResultGraph.CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, colorList[teamIndex]);
+                    m_ResultGraph.CreateDotConnection(lastCircleAnchoredPosition.Value, anchoredPosition, m_ColorList[teamIndex]);
                 }
                 lastCircleAnchoredPosition = anchoredPosition;
             }

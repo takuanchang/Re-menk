@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 public class PlayerGenerator : MonoBehaviour
 {
-    SettingManager setting;
-
     [SerializeField] private HumanPlayer m_HumanPrefab;
     [SerializeField] private ComputerPlayer m_ComputerPrefab;
     [SerializeField] private Camera m_MainCameraPrefab;
@@ -29,15 +27,6 @@ public class PlayerGenerator : MonoBehaviour
     /// マスを管理しているゲームオブジェクト名
     /// </summary>
     const string BoardObjectName = "Board";
-
-    /// <summary>
-    /// 操作可能な時のfreelookカメラの設定
-    /// </summary>
-    const int PlayableFreeLookPriority = 9;
-    /// <summary>
-    /// 操作不可能な時のfreelookカメラの設定
-    /// </summary>
-    const int NonplayableFreeLookPriority = 11;
 
     /// <summary>
     /// 駒の総数

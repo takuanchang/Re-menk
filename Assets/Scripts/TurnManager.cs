@@ -11,7 +11,7 @@ using System.Linq;
 
 public class TurnManager : MonoBehaviour
 {
-    private int m_currentPlayer = 0;
+    private int m_CurrentPlayer = 0;
     private int m_TurnNum = 0;
 
     // 現状このフラグを使う必要がなくなっている
@@ -22,7 +22,7 @@ public class TurnManager : MonoBehaviour
     private List<IPlayer> m_Players;
 
     [SerializeField]
-    private UiPrinter uiPrinter;
+    private UiPrinter m_UiPrinter;
 
     [SerializeField]
     private GameObject m_ResultUI;
@@ -58,12 +58,12 @@ public class TurnManager : MonoBehaviour
 
     public int CurrentPlayer
     {
-        get => m_currentPlayer;
+        get => m_CurrentPlayer;
 
         private set
         {
             Assert.IsTrue(0 <= value && value <= m_Players.Count, $"Range error : CurrentPlayer {value}");
-            m_currentPlayer = value;
+            m_CurrentPlayer = value;
         }
     }
 
@@ -187,7 +187,7 @@ public class TurnManager : MonoBehaviour
 
         // 仕方ないがUIプリンターにプレイヤー情報を入れる
         // TODO 実装時は表示しない(消す)
-        uiPrinter.Initialize(m_Players);
+        m_UiPrinter.Initialize(m_Players);
 
         m_TurnNum = 0; // ターン数を0に初期化
 

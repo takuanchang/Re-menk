@@ -11,7 +11,7 @@ public class Piece : MonoBehaviour
 {
     private PiecesManager m_PiecesManager = null;
 
-    private bool m_isDead = false;
+    private bool m_IsDead = false;
     private bool m_WillBeKilled = false;
     private Rigidbody rb;
 
@@ -28,7 +28,7 @@ public class Piece : MonoBehaviour
     }
 
     [SerializeField]
-    private float m_explosionParam = 2.0f;
+    private float m_ExplosionParam = 2.0f;
 
     /// <summary>
     /// 表裏判定の許容誤差
@@ -122,7 +122,7 @@ public class Piece : MonoBehaviour
         m_Kiraan.GetComponent<MeshRenderer>().enabled = false;
 
         // フラグを切る
-        m_isDead = false;
+        m_IsDead = false;
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public class Piece : MonoBehaviour
     /// </summary>
     public void UpdateTeam()
     {
-        if (m_isDead)
+        if (m_IsDead)
         {
             return;
         }
@@ -180,14 +180,14 @@ public class Piece : MonoBehaviour
 
     private Vector3 CalculateForce(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / (distance * distance);
+        float magnification = m_ExplosionParam / (distance * distance);
 
         return magnification * direction;
     }
 
     private Vector3 CalculateTorque(Vector3 direction, float distance)
     {
-        float magnification = m_explosionParam / (distance * distance);
+        float magnification = m_ExplosionParam / (distance * distance);
 
         return magnification * direction;
     }
@@ -224,7 +224,7 @@ public class Piece : MonoBehaviour
 
     public bool IsStable()
     {
-        return rb.IsSleeping() || m_isDead;
+        return rb.IsSleeping() || m_IsDead;
     }
 
     private bool IsUnderGround()
@@ -245,7 +245,7 @@ public class Piece : MonoBehaviour
     // とりあえずprivateにする。今後の実装によってはpublicの方がいいので注意
     private void Kill()
     {
-        m_isDead = true;
+        m_IsDead = true;
         Team = Team.None;
         gameObject.SetActive(false);
     }
