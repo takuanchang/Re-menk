@@ -72,7 +72,7 @@ public class PlayerGenerator : MonoBehaviour
             var myLayer = LayerMask.NameToLayer($"Player{i + 1}");
 
             HumanPlayer humanPlayer = Instantiate(m_HumanPrefab);
-            humanPlayer.Initialize((Team)(i % teamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0)); // TODO:3人以上の時Team等要修正
+            humanPlayer.Initialize((Team)(i % teamNum), m_TurnManager, piecesManager, individualPiecesNum + (i < remainPiecesNum ? 1 : 0));
             players.Add(humanPlayer);
 
             Camera mainCamera = Instantiate(m_MainCameraPrefab);

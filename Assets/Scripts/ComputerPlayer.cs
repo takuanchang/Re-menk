@@ -163,8 +163,6 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         // カメラを俯瞰視点にする
         ChangeCamerasPriority(UsingCamera.Select);
-        //m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        // m_WaitTimeCamera.Priority = NonUsingPriority;
 
         _ = ExecuteTurn();
 
@@ -231,10 +229,9 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
         return speedParam;
     }
 
-    // TODO : 実際はdir(direction)ではなく、大きさも含まれているので名前変える
-    public void Throw(Vector3 dir) {
+    public void Throw(Vector3 force) {
         Assert.IsNotNull(m_Target, "The piece trying to be thrown doesn't exist.");
-        m_Target.Shoot(dir);
+        m_Target.Shoot(force);
         m_Target = null;
         IsPlayable = false;
         return;

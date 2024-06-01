@@ -207,13 +207,13 @@ public class Piece : MonoBehaviour
     }
 
 
-    public void Shoot(Vector3 dir)
+    public void Shoot(Vector3 force)
     {
         m_SpeedEffect.SetActive(true);
 
         rb.useGravity = true;
         rb.constraints = RigidbodyConstraints.None;
-        rb.AddForce(dir, ForceMode.Impulse);
+        rb.AddForce(force, ForceMode.Impulse);
     }
 
     public void Stop()
@@ -257,10 +257,6 @@ public class Piece : MonoBehaviour
         {
             if (IsUpperCeil() && !m_WillBeKilled)
             {
-                // TODO: カメラを上に向けてキラーン✨
-                // Throwerにメッセージを送ってカメラを操作してもらう？
-                // FreeLookCameraのLookAtを消滅したポイントに変更する
-                // なんか色々おかしいので周辺の処理を考え直す
                 m_WillBeKilled = true;
 
                 // 指定の速度で上に飛ばす

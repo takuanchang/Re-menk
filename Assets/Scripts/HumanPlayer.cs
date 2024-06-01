@@ -177,9 +177,6 @@ public class HumanPlayer : MonoBehaviour , IPlayer
 
         // カメラを俯瞰視点にする
         ChangeCamerasPriority(UsingCamera.Select);
-        //m_SelectCamera.Priority = UsingPriority;
-        //m_PieceCamera.Priority = NonUsingPriority; // fixme : 相手のカメラのプライオリティが上がったままなので切り替わらない。修正する
-        //m_FreeLookCamera.Priority = NonUsingPriority;
 
         // レティクルのアニメーションを選択中のものに変更
         m_ReticuleControler.ChangeAnimation(GameState.Selecting);
