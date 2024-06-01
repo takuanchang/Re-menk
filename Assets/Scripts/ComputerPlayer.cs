@@ -177,7 +177,6 @@ public class ComputerPlayer : MonoBehaviour , IPlayer
 
         await UniTask.Delay(TimeSpan.FromSeconds(DelayTime)); // カメラ移動待ち
 
-        // TODO:マスが全破壊された場合の処理を考えるべき(勝敗条件など、Boardで破壊を通知された時等)
         IReadOnlyList<int> validSquareIndices = m_Board.ValidIndices;
         int selectedSquareId = validSquareIndices[UnityEngine.Random.Range(0, validSquareIndices.Count)];
         Vector3 pos = m_Board.GetSquarePosition(selectedSquareId);
