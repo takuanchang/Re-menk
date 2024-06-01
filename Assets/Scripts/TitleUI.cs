@@ -284,11 +284,11 @@ public class TitleUI : MonoBehaviour
     // TODO:可能なら一人用、二人用の設定はSetting側に用意したい
     public void SetSingleMode()
     {
-        SetGameMode(new Setting(1, 1, 2));
+        SetGameMode(Setting.Single);
     }
     public void SetDoubleMode()
     {
-        SetGameMode(new Setting(2, 0, 2));
+        SetGameMode(Setting.Double);
     }
     public void SetCustomMode()
     {
